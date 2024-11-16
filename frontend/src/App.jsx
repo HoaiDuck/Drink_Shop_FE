@@ -10,7 +10,7 @@ function App() {
 
   return (
     <div>
-       <div className='my-4'>
+       <div className=''>
          <Nav />
        </div>
        <main>

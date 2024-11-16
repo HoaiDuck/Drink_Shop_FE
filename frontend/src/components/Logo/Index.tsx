@@ -2,7 +2,7 @@ import React from 'react';
 
 const Logo = () => {
   return (
-    <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-full">
+    <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       className="h-8 w-8 text-white"
