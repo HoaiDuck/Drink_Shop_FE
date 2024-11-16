@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './index.css'
 import './app.css'
 import Nav from './components/Nav/Index'
+import Account from './components/Account/Index'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -11,7 +12,7 @@ function App() {
   return (
     <div>
        <div className=''>
-         <Nav />
+         <Account />
        </div>
        <main>
 
