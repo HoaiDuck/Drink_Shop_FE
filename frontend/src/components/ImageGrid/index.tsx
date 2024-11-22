@@ -1,35 +1,67 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Nav from "../Nav/Index";
 
 const images = [
-    { url: "https://via.placeholder.com/300x200", width: 300, height: 200 },
-    { url: "https://via.placeholder.com/300x450", width: 300, height: 450 },
-    { url: "https://via.placeholder.com/200x300", width: 200, height: 300 },
-    // Thêm các ảnh khác vào đây
-  ];
+  { url: "./img/img1.jpg" },
+  { url: "./img/img2.jpg" },
+  { url: "./img/img3.jpg" },
+  { url: "./img/img4.jpg" },
+  { url: "./img/img5.jpg" },
+  { url: "./img/img6.jpg" },
+  { url: "./img/img7.jpg" },
+  { url: "./img/img8.jpg" },
+  { url: "./img/img9.jpg" },
+  { url: "./img/img10.jpg" },
+  { url: "./img/img11.jpg" },
+  // Thêm các ảnh khác vào đây
+];
 
-  const ImageGrid = () => {
-    return (
-      <div className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-4 p-4">
-        {images.map((image, index) => {
-          const aspectRatio = image.height / image.width;
-          return (
-            <div
-              key={index}
-              className="relative overflow-hidden w-[200px]"
-              style={{
-                height: `calc(200px * ${aspectRatio})`,
-              }}
-            >
-              <img
-                src={image.url}
-                alt={`Image ${index}`}
-                className="absolute top-0 left-0 w-full h-full object-cover"
-              />
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
+const ImageGrid = () => {
+  const [imageDimensions, setImageDimensions] = useState([]);
+
+  useEffect(() => {
+    // Tải ảnh và lấy thông tin chiều rộng, chiều cao
+    const loadImages = async () => {
+      const loadedDimensions = await Promise.all(
+        images.map(async (image) => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.src = image.url;
+            img.onload = () => {
+              resolve({ url: image.url, width: img.width, height: img.height });
+            };
+          });
+        })
+      );
+      setImageDimensions(loadedDimensions);
+    };
+
+    loadImages();
+  }, []);
+
+  return (
+    <div className="flex flex-wrap justify-start gap-4 p-4">
+      {imageDimensions.map((image, index) => {
+        const aspectRatio = image.height / image.width; // Tính tỷ lệ ảnh
+        return (
+          <div
+            key={index}
+            className="overflow-hidden rounded-md"
+            style={{
+              width: "197.5px", // Chiều ngang cố định
+              height: `calc(197.5px * ${aspectRatio})`, // Chiều cao tự tính theo tỉ lệ
+            }}
+          >
+            <img
+              src={image.url}
+              alt={`Image ${index}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export default ImageGrid;
