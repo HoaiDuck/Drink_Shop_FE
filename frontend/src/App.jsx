@@ -5,6 +5,8 @@ import './index.css'
 import './app.css'
 import Nav from './components/Nav/Index'
 import Account from './components/Account/Index'
+import LoginForm from './components/LoginForm/Index'
+import RegisterForm from './components/RegisterForm/Index'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -12,7 +14,7 @@ function App() {
   return (
     <div>
        <div className=''>
-         <Account />
+         <RegisterForm />
        </div>
        <main>
 
