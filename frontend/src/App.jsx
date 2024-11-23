@@ -4,7 +4,6 @@ import viteLogo from '/vite.svg'
 import './index.css'
 import './app.css'
 import Nav from './components/Nav/Index';
-import ImageGrid from './components/ImageGrid/index'
 import Account from './components/Account/Index'
 import LoginForm from './components/LoginForm/Index'
 import RegisterForm from './components/RegisterForm/Index'
@@ -14,8 +13,7 @@ function App() {
 
   return (
     <div className='App'>
-    <Nav />
-    <ImageGrid />
+    <RegisterForm />
     </div>
   
   )
