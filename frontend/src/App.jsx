@@ -7,13 +7,15 @@ import Nav from './components/Nav/Index';
 import Account from './components/Account/Index'
 import LoginForm from './components/LoginForm/Index'
 import RegisterForm from './components/RegisterForm/Index'
+import ImageGrid from './components/ImageGrid/Index'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <div className='App'>
-    <RegisterForm />
+      <Nav/>
+    <ImageGrid />
     </div>
   
   )
