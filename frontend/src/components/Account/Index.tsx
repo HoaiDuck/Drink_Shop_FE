@@ -1,5 +1,6 @@
 import React from "react";
-import Nav from "../Nav/Index"; // Import component Navbar
+import Nav from "../Nav/Index"; 
+import Logo from "../Logo/Index";
 
 const Account = () => {
   return (
@@ -16,7 +17,7 @@ const Account = () => {
             Follower
           </button>
           <button className="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300">
-            Chỉnh sửa tài khoản
+            Chỉnh sửa tài khoản   
           </button>
           <button className="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300">
             Chia sẻ

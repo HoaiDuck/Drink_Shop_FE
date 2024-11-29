@@ -13,7 +13,7 @@ const Index = () =>{
   
       
       <div className="flex items-center space-x-4 px-5">
-        <button className="font-medium px-4 py-2 bg-black text-white rounded-full hover:bg-gray-300 hover:text-black">
+        <button className="font-medium px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-300 hover:text-black">
         Trang chủ
         </button>
 

@@ -2,6 +2,8 @@ import React from 'react';
 import { AiOutlineUser, AiOutlineLock } from 'react-icons/ai';
 import { BsEye } from 'react-icons/bs';
 import Logo from "../Logo/Index"
+import LoginName from '../RegisterForm/LoginName';
+import Password from '../RegisterForm/Password';
 
 const LoginForm = () => {
   return (
@@ -12,23 +14,8 @@ const LoginForm = () => {
         </div>
         <h1 className="text-2xl font-bold text-center mb-6">WELCOME</h1>
         <div className="space-y-4">
-          <div className="flex items-center bg-gray-100 p-3 rounded-lg">
-            <AiOutlineUser className="text-gray-500 mr-3" />
-            <input
-              type="text"
-              placeholder="Tên đăng nhập"
-              className="bg-transparent outline-none w-full"
-            />
-          </div>
-          <div className="flex items-center bg-gray-100 p-3 rounded-lg">
-            <AiOutlineLock className="text-gray-500 mr-3" />
-            <input
-              type="password"
-              placeholder="Mật khẩu"
-              className="bg-transparent outline-none w-full"
-            />
-            <BsEye className="text-gray-500" />
-          </div>
+          <LoginName/>
+          <Password/>
         </div>
         <div className="flex justify-between text-sm text-gray-500 mt-4">
           <a href="#" className="hover:underline text-blue-500">Đăng kí</a>
