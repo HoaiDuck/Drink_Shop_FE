@@ -59,8 +59,8 @@ const ImageGrid = () => {
           style={{
             width: "197.5px", // Chiều ngang cố định
             height: `${197.5 * aspectRatio}px`, // Chiều cao tự tính theo tỉ lệ
-          }}
-          >
+          }} 
+          > 
             <img
               src={image.url}
               alt={`Image ${index}`}

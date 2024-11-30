@@ -1,6 +1,5 @@
 import React from 'react';
 import { AiOutlineUser, AiOutlineLock, AiOutlineMail } from 'react-icons/ai';
-
 const LoginName = () => {
     return(
         <div className="flex items-center bg-gray-100 p-3 rounded-lg">

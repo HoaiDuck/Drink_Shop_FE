@@ -1,22 +1,19 @@
-
 import React from "react"
 import Logo from "../Logo/Index"
+import { Link } from "react-router-dom";  // Import Link từ react-router-dom
 
-const Index = () =>{
+const Nav = () =>{
     return (
       <nav className="flex items-center justify-between bg-gray-100 p-3 rounded-lg shadow-md">
       <div className=" flex flex-row">
       <button className="flex items-center space-x-2">
         <div className="w-10 h-10 bg-gray-300 rounded"><Logo/></div>
         <span className="sr-only">Logo</span>
-      </button>
-  
-      
+      </button>   
       <div className="flex items-center space-x-4 px-5">
         <button className="font-medium px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-300 hover:text-black">
         Trang chủ
         </button>
-
         <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
           Thể loại 
           <span className="ml-1">
@@ -42,8 +39,7 @@ const Index = () =>{
           </span>
         </button>
       </div>
-      </div>
-      
+      </div>      
       <div className="flex items-center space-x-4">
         <div className="relative w-80">
           <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">
@@ -56,8 +52,7 @@ const Index = () =>{
           placeholder="Tìm kiếm"
           className="px-10 py-2 bg-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400"
           />
-        </div>
-        
+        </div>        
         <button className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center hover:bg-gray-400">
           <span>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -82,5 +77,4 @@ const Index = () =>{
     </nav>
     )
 }
-
-export default Index
+export default Nav
