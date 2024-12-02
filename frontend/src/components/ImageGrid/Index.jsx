@@ -17,9 +17,7 @@ const images = [
 ];
 
 const ImageGrid = () => {
-  const [imageDimensions, setImageDimensions] = useState<
-    { url: string; width: number; height: number }[]
-  >([]);
+  const [imageDimensions, setImageDimensions] = useState([]);
 
   useEffect(() => {
     // Tải ảnh và lấy thông tin chiều rộng, chiều cao
@@ -27,19 +25,17 @@ const ImageGrid = () => {
       const loadedDimensions = await Promise.all(
         images.map(
           (image) =>
-            new Promise<{ url: string; width: number; height: number }>(
-              (resolve) => {
-                const img = new Image();
-                img.src = image.url;
-                img.onload = () => {
-                  resolve({
-                    url: image.url,
-                    width: img.width,
-                    height: img.height,
-                  });
-                };
-              }
-            )
+            new Promise((resolve) => {
+              const img = new Image();
+              img.src = image.url;
+              img.onload = () => {
+                resolve({
+                  url: image.url,
+                  width: img.width,
+                  height: img.height,
+                });
+              };
+            })
         )
       );
       setImageDimensions(loadedDimensions);
@@ -54,13 +50,13 @@ const ImageGrid = () => {
         const aspectRatio = image.height / image.width; // Tính tỷ lệ ảnh
         return (
           <div
-          key={index}
-          className="overflow-hidden rounded-md"
-          style={{
-            width: "197.5px", // Chiều ngang cố định
-            height: `${197.5 * aspectRatio}px`, // Chiều cao tự tính theo tỉ lệ
-          }} 
-          > 
+            key={index}
+            className="overflow-hidden rounded-md"
+            style={{
+              width: "197.5px", // Chiều ngang cố định
+              height: `${197.5 * aspectRatio}px`, // Chiều cao tự tính theo tỉ lệ
+            }}
+          >
             <img
               src={image.url}
               alt={`Image ${index}`}

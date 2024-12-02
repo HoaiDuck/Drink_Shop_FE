@@ -5,8 +5,7 @@ import Logo from "../Logo/Index";
 const Account = () => {
   return (
     <div className="relative w-screen h-screen flex flex-col bg-gray-100">
-      <Nav />
-
+<Nav/>
       <div className="flex-grow flex flex-col items-center justify-center">
         <div className="w-24 h-24 rounded-full bg-gray-300"></div>
         <h1 className="text-2xl font-bold mt-4">Duck</h1>
