@@ -1,6 +1,5 @@
 import React from "react";
 import Nav from "../Nav/Index"; 
-import Logo from "../Logo/Index";
 
 const Account = () => {
   return (
