@@ -20,7 +20,6 @@ const ImageGrid = () => {
   const [imageDimensions, setImageDimensions] = useState([]);
 
   useEffect(() => {
-    // Tải ảnh và lấy thông tin chiều rộng, chiều cao
     const loadImages = async () => {
       const loadedDimensions = await Promise.all(
         images.map(
@@ -35,6 +34,13 @@ const ImageGrid = () => {
                   height: img.height,
                 });
               };
+              img.onerror = () => {
+                resolve({
+                  url: image.url,
+                  width: 0,
+                  height: 0, // Mặc định nếu ảnh không tải được
+                });
+              };
             })
         )
       );
@@ -46,25 +52,35 @@ const ImageGrid = () => {
 
   return (
     <div className="flex flex-wrap justify-start gap-4 p-4">
-      {imageDimensions.map((image, index) => {
-        const aspectRatio = image.height / image.width; // Tính tỷ lệ ảnh
-        return (
-          <div
-            key={index}
-            className="overflow-hidden rounded-md"
-            style={{
-              width: "197.5px", // Chiều ngang cố định
-              height: `${197.5 * aspectRatio}px`, // Chiều cao tự tính theo tỉ lệ
-            }}
-          >
-            <img
-              src={image.url}
-              alt={`Image ${index}`}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        );
-      })}
+      <div style={{ overflow: "hidden", padding: "16px" }}>
+        {imageDimensions.map((image, index) => {
+          const aspectRatio = image.height / image.width;
+          const imageHeight = 197.5 * aspectRatio; // Chiều cao tự tính theo tỉ lệ
+          return (
+            <div
+              key={index}
+              style={{
+                float: "left",
+                margin: "8px",
+                width: "190px", // Chiều ngang cố định
+                height: `${imageHeight}px`,
+                backgroundColor: "#e0e0e0", // Màu nền mặc định nếu ảnh không tải được
+              }}
+            >
+              <img
+                src={image.url}
+                alt={`Image ${index}`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: image.width ? "block" : "none", // Ẩn ảnh nếu không tải được
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

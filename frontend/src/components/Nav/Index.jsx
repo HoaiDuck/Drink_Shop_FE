@@ -2,19 +2,15 @@ import React from "react"
 import Logo from "../Logo/Index"
 import BtnAccount from "./BtnAccount"
 import BtnMenu from "./BtnMenu"
+import BtnHome from "./BtnHome"
 
 const Nav = () =>{
     return (
       <nav className="flex items-center justify-between bg-gray-100 p-3 rounded-lg shadow-md">
       <div className=" flex flex-row">
-      <button className="flex items-center space-x-2">
-        <div className="w-10 h-10 bg-gray-300 rounded"><Logo/></div>
-        <span className="sr-only">Logo</span>
-      </button>   
+      <Logo />  
       <div className="flex items-center space-x-4 px-5">
-        <button className="font-medium px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-300 hover:text-black">
-        Trang chủ
-        </button>
+        <BtnHome />
         <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
           Thể loại 
           <span className="ml-1">
