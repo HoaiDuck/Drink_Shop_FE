@@ -1,9 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [],
+  mode: "jit",
+  content: ["./index.html", "./src/**/*.{html,js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        fontjapan: ['"Noto Sans Japanese"', "sans-serif"],
+      },
+    },
   },
   plugins: [],
-}
-
+};
