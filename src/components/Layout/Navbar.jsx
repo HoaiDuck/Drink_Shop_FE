@@ -1,9 +1,10 @@
 import React from "react";
-import Logo from "../Logo/Index";
+
 import BtnAccount from "./Nav/BtnAccount";
 import BtnMenu from "./Nav/BtnMenu";
 import BtnHome from "./Nav/BtnHome";
 import { Link, Outlet } from "react-router-dom";
+import { Logo } from "@/components/Logo";
 const Navbar = () => {
   return (
     <div>
