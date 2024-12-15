@@ -1,10 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
-import LoginForm from "../pages/login";
-import Account from "../pages/Account";
-import Home from "../pages/Home";
-import Navbar from "../components/Layout/Navbar";
-import AddToCart from "../pages/AddToCart";
-import ProductForm from "../pages/Products";
+import Navbar from "@/components/Layout/Navbar";
+import { LoginForm, Account, Home, Register } from "@/pages";
+import Products from "@/pages/Products";
+import { Dashboard, AccountList, Role, Request } from "@/pages";
+import { DashboardLayout } from "@/components/LayoutAdmin";
 
 const router = createBrowserRouter([
   {
@@ -21,12 +20,12 @@ const router = createBrowserRouter([
       },
       {
         path: "Product",
-        element: <ProductForm/>
+        element: <Products/>,
       },
-      {
-        path: "AddToCart",
-        element: <AddToCart/>
-      }
+      //{
+      //  path: "AddToCart",
+      //  element: <AddToCart/>,
+      //y},
     ],
   },
   //{
@@ -36,6 +35,28 @@ const router = createBrowserRouter([
   {
     path: "Login",
     element: <LoginForm />,
+  },
+  {
+    path: "/Admin",
+    element: <DashboardLayout />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: "Role",
+        element: <Role />,
+      },
+      {
+        path: "Request",
+        element: <Request />,
+      },
+      {
+        path: "Account",
+        element: <AccountList />,
+      },
+    ],
   },
 ]);
 

@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   resolve: {
+    alias: [{ find: "@", replacement: "/src" }],
     extensions: [".js", ".jsx"], // Đảm bảo Vite hỗ trợ .js và .jsx
   },
 });

@@ -1,6 +1,6 @@
 import React from "react";
 
-const ProductForm = () => {
+const Products = () => {
   return (
     <div className="flex justify-center items-center p-8">
       <div className="w-1/3 flex flex-col items-center border p-4">
@@ -74,4 +74,4 @@ const ProductForm = () => {
   );
 };
 
-export default ProductForm;
+export default Products;
