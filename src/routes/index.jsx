@@ -1,9 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
 import Navbar from "@/components/Layout/Navbar";
 import { LoginForm, Account, Home, Register } from "@/pages";
-
-import { Dashboard, AccountList, Role, Request, Error } from "@/pages";
-import Products from "@/pages/Products";
+import {
+  Dashboard,
+  AccountList,
+  Role,
+  Request,
+  Error,
+  Products,
+} from "@/pages";
 
 import { DashboardLayout } from "@/components/LayoutAdmin";
 
