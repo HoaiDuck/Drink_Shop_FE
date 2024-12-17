@@ -1,11 +1,22 @@
-import React, { useState } from "react";
+import { useState } from "react";
 // import { AiOutlineUser, AiOutlineLock } from "react-icons/ai";
 // import { BsEye } from "react-icons/bs";
-
-import { LoginName, Password } from "@/components/RegisterForm/index.js";
+import { AiOutlineUser, AiOutlineLock, AiOutlineMail } from "react-icons/ai";
 import { Logo } from "@/components/Logo";
-import { BtnLogin } from "@/components/LoginForm";
 import { useNavigate } from "react-router-dom";
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  message,
+  notification,
+  setLoading,
+} from "antd";
+import { loginApi } from "@/service";
+
+import "./login.css";
+
 const LoginForm = () => {
   const navigate = useNavigate();
   const handleClickLogin = () => {
@@ -14,68 +25,125 @@ const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Ngăn chặn reload trang
-
-    // Kiểm tra dữ liệu
-    let validationErrors = {};
-    if (!username.trim()) {
-      validationErrors.username = "Username không được để trống.";
+  const [messageApi, contextHolder] = message.useMessage();
+  const onFinish = async (values) => {
+    const res = await loginApi.login({
+      email: values.email,
+      password: values.password,
+    });
+    console.log(">>>>>CHECK RESPONSE:", res.data);
+    if (res.data) {
+      setLoading(false);
+      messageApi.info("LOGIN SUCCESS!!!");
+      notification.info("LOGIN SUCCESS!!!");
+      console.log("LOGIN SUCCESS!!!");
+    } else {
+      message.error("Login Failed");
     }
-    if (!password.trim()) {
-      validationErrors.password = "Password không được để trống.";
-    }
-
-    // Cập nhật trạng thái lỗi nếu có
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    // Nếu không có lỗi
-    alert("Đăng nhập thành công!");
-    setErrors({});
+  };
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
   };
   return (
-    <form
-      onSubmit={handleSubmit}
+    <Form
       className="w-full h-screen flex items-center justify-center bg-gray-200"
+      name="basic"
+      labelCol={{
+        span: 6,
+      }}
+      wrapperCol={{
+        span: 16,
+      }}
+      // style={{
+      //   maxWidth: 600,
+      // }}
+      // initialValues={{
+      //   remember: true,
+      // }}
+      onFinish={onFinish}
+      onFinishFailed={onFinishFailed}
+      autoComplete="off"
     >
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
         <div className="flex items-center justify-center mb-4">
           <Logo />
         </div>
         <h1 className="text-2xl font-bold text-center mb-6">WELCOME</h1>
-        <div className="space-y-4">
-          <div>
-            <LoginName
-              label="Username:"
-              value={username}
-              onChange={setUsername}
-              onValidate={(value) => handleSubmit("username", value)}
-              error={errors.username}
-            />
-          </div>
-          <div>
-            <Password />
-          </div>
-        </div>
-        <div className="flex justify-between text-sm text-gray-500 mt-4">
-          <a
-            onClick={handleClickLogin}
-            href="#"
-            className="hover:underline text-blue-500"
+        <div className="flex flex-col">
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please input your email!",
+              },
+            ]}
           >
-            Đăng kí
-          </a>
+            <Input
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Password "
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+            ]}
+          >
+            <Input.Password
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+            />
+          </Form.Item>
+          <div id="submitContainer" className="flex flex-col">
+            <Form.Item
+              name="remember"
+              valuePropName="checked"
+              label={null}
+              className="m-0"
+            >
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
+            <div id="buttonSubmitLogin">
+              <Form.Item label={null} className="">
+                <Button
+                  className="flex-wrap w-full py-2 rounded-lg mt-6 text-white bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 shadow-md"
+                  type="primary"
+                  htmlType="submit"
+                >
+                  Submit
+                </Button>
+              </Form.Item>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-between text-sm text-gray-500 mt-4">
+          <span>
+            Don`t have an account?{" "}
+            <a
+              onClick={handleClickLogin}
+              href="#"
+              className="hover:underline text-blue-500"
+            >
+              Sign Up
+            </a>
+          </span>
+
           <a href="#" className="hover:underline">
-            Quên mật khẩu
+            Forget password?
           </a>
         </div>
-        <BtnLogin />
       </div>
-    </form>
+    </Form>
   );
 };
 

@@ -3,7 +3,7 @@ import { instance } from "@/util";
 const loginApi = {
   login(data) {
     const url = "login/";
-    return instance.get(url, data);
+    return instance.post(url, data);
   },
   get(id) {
     const url = `user/Acc/${id}`;

@@ -18,7 +18,7 @@ const accountApi = {
     return instance.put(url, data);
   },
   delete(data) {
-    const url = `user/Acc`;
+    const url = "user/Acc";
     return instance.delete(url, data);
   },
 };

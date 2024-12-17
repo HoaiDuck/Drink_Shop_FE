@@ -4,9 +4,9 @@ import App from "@/App.jsx"; // Import component chính
 import "./index.css";
 import { MaterialTailwindControllerProvider } from "@/context";
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <MaterialTailwindControllerProvider>
-      <App />
-    </MaterialTailwindControllerProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <MaterialTailwindControllerProvider>
+    <App />
+  </MaterialTailwindControllerProvider>
+  // </React.StrictMode>
 );
