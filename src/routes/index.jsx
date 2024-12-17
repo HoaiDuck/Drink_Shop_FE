@@ -1,8 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
 import Navbar from "@/components/Layout/Navbar";
 import { LoginForm, Account, Home, Register } from "@/pages";
+
 import { Dashboard, AccountList, Role, Request, Error } from "@/pages";
+import Products from "@/pages/Products";
+
 import { DashboardLayout } from "@/components/LayoutAdmin";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -17,12 +21,20 @@ const router = createBrowserRouter([
         path: "Account",
         element: <Account />,
       },
+      {
+        path: "Product",
+        element: <Products />,
+      },
+      //{
+      //  path: "AddToCart",
+      //  element: <AddToCart/>,
+      //y},
     ],
   },
-  {
-    path: "register",
-    element: <Register />,
-  },
+  //{
+  //     path: "register",
+  //     element: <RegisterPage />,
+  //},
   {
     path: "Login",
     element: <LoginForm />,

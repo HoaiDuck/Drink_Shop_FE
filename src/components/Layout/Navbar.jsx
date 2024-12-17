@@ -3,12 +3,13 @@ import React from "react";
 import BtnAccount from "./Nav/BtnAccount";
 import BtnMenu from "./Nav/BtnMenu";
 import BtnHome from "./Nav/BtnHome";
+import BtnCreate from "./Nav/BtnCreate";
 import { Link, Outlet } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 const Navbar = () => {
   return (
     <div>
-      <nav className="flex items-center justify-between bg-gray-100 p-3 rounded-lg shadow-md">
+      <nav className="flex items-center justify-between bg-gray-100 p-3 rounded-lg shadow-md sticky top-0 z-50">
         <div className=" flex flex-row">
           <Logo />
           <div className="flex items-center space-x-4 px-5">
@@ -32,25 +33,7 @@ const Navbar = () => {
                 </svg>
               </span>
             </button>
-            <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
-              Tạo
-              <span className="ml-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"
-                  />
-                </svg>
-              </span>
-            </button>
+            <BtnCreate/>
             <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
               Đấu giá
               <span className="ml-2">
