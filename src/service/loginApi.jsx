@@ -1,9 +1,9 @@
 import { instance } from "@/util";
 
-const accountApi = {
-  getAll() {
-    const url = "user/Acc";
-    return instance.get(url);
+const loginApi = {
+  login(data) {
+    const url = "login/";
+    return instance.get(url, data);
   },
   get(id) {
     const url = `user/Acc/${id}`;
@@ -22,4 +22,4 @@ const accountApi = {
     return instance.delete(url, data);
   },
 };
-export default accountApi;
+export default loginApi;

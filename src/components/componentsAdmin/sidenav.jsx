@@ -1,64 +1,79 @@
-import PropTypes from "prop-types";
-import { Link, NavLink } from "react-router-dom";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import {
-  Avatar,
-  Button,
-  IconButton,
-  Typography,
-} from "@material-tailwind/react";
-import { useMaterialTailwindController, setOpenSidenav } from "@/context";
-
-export function Sidenav({ brandImg, brandName, routes }) {
-  const [controller, dispatch] = useMaterialTailwindController();
-  const { sidenavColor, sidenavType, openSidenav } = controller;
-  const sidenavTypes = {
-    dark: "bg-gradient-to-br from-gray-800 to-gray-900",
-    white: "bg-white shadow-sm",
-    transparent: "bg-transparent",
+import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { useState } from "react";
+import { Logo } from "@/components/Logo";
+import { accountApi } from "@/service";
+const { Sider } = Layout;
+function getItem(label, key, icon, children) {
+  return {
+    key,
+    icon,
+    children,
+    label,
   };
-
-  return (
-    <aside
-      className={`${sidenavTypes[sidenavType]} ${
-        openSidenav ? "translate-x-0" : "-translate-x-80"
-      } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
-    >
-      <div className={`relative`}>
-        <Link to="/" className="py-6 px-8 text-center">
-          <Typography
-            variant="h6"
-            color={sidenavType === "dark" ? "white" : "blue-gray"}
-          >
-            {brandName}
-          </Typography>
-        </Link>
-        <IconButton
-          variant="text"
-          color="white"
-          size="sm"
-          ripple={false}
-          className="absolute right-0 top-0 grid rounded-br-none rounded-tl-none xl:hidden"
-          onClick={() => setOpenSidenav(dispatch, false)}
-        >
-          <XMarkIcon strokeWidth={2.5} className="h-5 w-5 text-white" />
-        </IconButton>
-      </div>
-    </aside>
-  );
 }
+import {
+  DesktopOutlined,
+  FileOutlined,
+  PieChartOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+const items = [
+  getItem("Dashboard", "dashboard", <PieChartOutlined />),
+  getItem("Account", "account", <DesktopOutlined />),
+  getItem("Request", "Request_sup", <UserOutlined />, [
+    getItem("Tom", "3"),
+    getItem("Bill", "4"),
+    getItem("Alex", "5"),
+  ]),
+  getItem("Team", "sub2", <TeamOutlined />, [
+    getItem("Team 1", "6"),
+    getItem("Team 2", "8"),
+  ]),
+  getItem("Files", "9", <FileOutlined />),
+];
 
-Sidenav.defaultProps = {
-  brandImg: "/img/logo-ct.png",
-  brandName: "Material Tailwind React",
+const handleMenuClick = async (e) => {
+  console.log("Clicked item key:", e.key);
+  const res = await accountApi.getAll();
+
+  // Xử lý logic theo từng key
+  switch (e.key) {
+    case "dashboard":
+      console.log("Test get all ACCOUNT:", res.data);
+      break;
+    case "account":
+      console.log("Navigate to Account");
+      break;
+    case "tom":
+      console.log("Tom's Request selected");
+      break;
+    default:
+      console.log(`Unhandled menu key: ${e.key}`);
+  }
 };
 
-Sidenav.propTypes = {
-  brandImg: PropTypes.string,
-  brandName: PropTypes.string,
-  routes: PropTypes.arrayOf(PropTypes.object).isRequired,
+const Sidenav = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  return (
+    <Sider
+      collapsible
+      collapsed={collapsed}
+      onCollapse={(value) => setCollapsed(value)}
+    >
+      <div className="demo-logo-vertical">
+        <h6 className="bg-main-green p-1 text-white font-bold font-sans m-5 border-indigo-50 text-center rounded-full">
+          Graphic Design Website
+        </h6>
+      </div>
+      <Menu
+        theme="dark"
+        defaultSelectedKeys={["1"]}
+        mode="inline"
+        items={items}
+        onClick={handleMenuClick}
+      />
+    </Sider>
+  );
 };
-
-Sidenav.displayName = "/src/widgets/layout/sidnave.jsx";
-
 export default Sidenav;

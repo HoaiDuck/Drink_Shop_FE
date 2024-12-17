@@ -2,19 +2,22 @@ import axios from "axios";
 
 // Set config defaults when creating the instance
 const instance = axios.create({
-  baseURL: "https://api.example.com",
+  baseURL: import.meta.env.VITE_BE_URL,
+  //baseURL: localhost/80708070
 });
-
+//Why set import.meta.env.BE_URL and API will return something really strange?
 // Alter defaults after instance has been created
-instance.defaults.headers.common["Authorization"] = import.meta.env.BE_URL;
+instance.defaults.headers.common["Authorization"] = import.meta.env.VITE_BE_URL;
 // Add a request interceptor
 instance.interceptors.request.use(
   function (config) {
-    // Do something before request is sent
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   function (error) {
-    // Do something with request error
     return Promise.reject(error);
   }
 );

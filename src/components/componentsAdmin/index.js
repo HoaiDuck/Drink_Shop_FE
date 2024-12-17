@@ -1,4 +1,4 @@
-export * from "@/components/componentsAdmin/sidenav";
+export { default as Sidenav } from "@/components/componentsAdmin/sidenav";
 export * from "@/components/componentsAdmin/dashboard-navbar";
 export * from "@/components/componentsAdmin/configurator";
 export * from "@/components/componentsAdmin/footer";

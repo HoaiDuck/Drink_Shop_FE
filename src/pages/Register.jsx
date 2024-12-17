@@ -7,7 +7,12 @@ import {
   AgainPassword,
   BtnRegister,
 } from "@/components/RegisterForm";
+import { useNavigate } from "react-router-dom";
 const Register = () => {
+  const navigate = useNavigate();
+  const handleClickLogin = () => {
+    navigate("/login");
+  };
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-200">
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
@@ -22,7 +27,7 @@ const Register = () => {
           <AgainPassword />
         </div>
         <div className="flex justify-between text-sm text-gray-500 mt-4">
-          <a href="#" className="hover:underline">
+          <a onClick={handleClickLogin} href="#" className="hover:underline">
             Đã có tài khoản? Đăng nhập
           </a>
         </div>

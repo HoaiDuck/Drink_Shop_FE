@@ -7,6 +7,12 @@ export default {
       fontFamily: {
         fontjapan: ['"Noto Sans Japanese"', "sans-serif"],
       },
+      color: {
+        "main-green": "linear-gradient(to right, #49DB83, #3B85F2)",
+      },
+      backgroundImage: {
+        "main-green": "linear-gradient(to right, #49DB83, #3B85F2)",
+      },
     },
   },
   plugins: [],
