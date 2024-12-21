@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+
 import Navbar from "@/components/Layout/Navbar";
 import { LoginForm, Account, Home, Register } from "@/pages";
 import {
