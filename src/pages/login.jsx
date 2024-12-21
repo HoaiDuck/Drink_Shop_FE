@@ -1,18 +1,12 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import { AiOutlineUser, AiOutlineLock } from "react-icons/ai";
 // import { BsEye } from "react-icons/bs";
 import { AiOutlineUser, AiOutlineLock, AiOutlineMail } from "react-icons/ai";
 import { Logo } from "@/components/Logo";
 import { useNavigate } from "react-router-dom";
-import {
-  Button,
-  Checkbox,
-  Form,
-  Input,
-  message,
-  notification,
-  
-} from "antd";
+
+import { Button, Checkbox, Form, Input, message, notification } from "antd";
+// >>>>>>> e4e6c0421aefcd3d6d4651b4b29c72a725d28a41
 import { loginApi } from "@/service";
 
 import "./login.css";
@@ -32,16 +26,18 @@ const LoginForm = () => {
       password: values.password,
     });
     console.log(">>>>>CHECK RESPONSE:", res.data);
-    if (res.data) {
-      setLoading(false);
-      messageApi.info("LOGIN SUCCESS!!!");
-      notification.info("LOGIN SUCCESS!!!");
+    if (res && res.data.EC == 0) {
+      localStorage.setItem("access_token", res.access_token);
+      messageApi.success("Login Success!");
       console.log("LOGIN SUCCESS!!!");
+      navigate("/");
     } else {
-      message.error("Login Failed");
+      messageApi.error("Login Failed!");
+      message.error("LOGIN FAILED!!!", res?.data ?? "Unknown Error!!");
     }
   };
   const onFinishFailed = (errorInfo) => {
+    messageApi.destroy("Login Failed!");
     console.log("Failed:", errorInfo);
   };
   return (
@@ -114,6 +110,7 @@ const LoginForm = () => {
             </Form.Item>
             <div id="buttonSubmitLogin">
               <Form.Item label={null} className="">
+                {contextHolder}
                 <Button
                   className="flex-wrap w-full py-2 rounded-lg mt-6 text-white bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 shadow-md"
                   type="primary"

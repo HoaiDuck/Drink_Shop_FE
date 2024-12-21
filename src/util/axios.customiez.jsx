@@ -11,7 +11,7 @@ instance.defaults.headers.common["Authorization"] = import.meta.env.VITE_BE_URL;
 // Add a request interceptor
 instance.interceptors.request.use(
   function (config) {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("access_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
