@@ -8,3 +8,5 @@ export { default as Request } from "@/pages/Admin/Request";
 export { default as Role } from "@/pages/Admin/Role";
 export { default as Error } from "@/pages/ErrorHandle";
 export { default as Products } from "@/pages/Products";
+export { default as AddToCart} from "@/pages/AddToCart";
+export { default as Payment} from "@/pages/Payment";

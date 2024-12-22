@@ -9,6 +9,8 @@ import {
   Request,
   Error,
   Products,
+  AddToCart,
+  Payment
 } from "@/pages";
 
 import { DashboardLayout } from "@/components/LayoutAdmin";
@@ -31,10 +33,14 @@ const router = createBrowserRouter([
         path: "Product",
         element: <Products />,
       },
-      //{
-      //  path: "AddToCart",
-      //  element: <AddToCart/>,
-      //y},
+      {
+        path: "AddToCart",
+        element: <AddToCart/>,
+      },
+      {
+        path: "Payment",
+        element: <Payment/>
+      }
     ],
   },
   //{

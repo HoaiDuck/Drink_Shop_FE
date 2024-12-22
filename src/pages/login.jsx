@@ -114,8 +114,7 @@ const LoginForm = () => {
                 <Button
                   className="flex-wrap w-full py-2 rounded-lg mt-6 text-white bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 shadow-md"
                   type="primary"
-                  htmlType="submit"
-                >
+                  htmlType="submit">
                   Submit
                 </Button>
               </Form.Item>
