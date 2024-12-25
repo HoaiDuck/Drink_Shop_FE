@@ -26,6 +26,10 @@ const AddToCart = () => {
                 <p className="text-sm text-gray-600">Bags & Accessories</p>
               </div>
               <div className="my-2">
+                <h3 className="font-medium">Artist:</h3>
+                <p className="text-sm text-gray-600">John Doe</p> {/* Replace with artist name */}
+              </div>
+              <div className="my-2">
                 <h3 className="font-medium">Description:</h3>
                 <p className="text-sm text-gray-600">
                   The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.
