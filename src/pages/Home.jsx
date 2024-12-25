@@ -1,52 +1,51 @@
 import React, { useState, useEffect } from "react";
 import Masonry from "react-masonry-css"; // Import thư viện Masonry
-const images = [
-  { url: "/img/img1.jpg" },
-  { url: "/img/img2.jpg" },
-  { url: "/img/img3.jpg" },
-  { url: "/img/img4.jpg" },
-  { url: "/img/img5.jpg" },
-  { url: "/img/img6.jpg" },
-  { url: "/img/img7.jpg" },
-  { url: "/img/img8.jpg" },
-  { url: "/img/img9.jpg" },
-  { url: "/img/img10.jpg" },
-  { url: "/img/img11.jpg" },
-  // Thêm các ảnh khác vào đây
-];
+import {itemApi} from "@/service"; // Import API từ tệp đã khai báo
 
 const Home = () => {
-  const [imageDimensions, setImageDimensions] = useState([]);
+  const [imageDimensions, setImageDimensions] = useState([]); // State lưu thông tin ảnh
+  const [loading, setLoading] = useState(true); // State hiển thị trạng thái tải ảnh
 
   useEffect(() => {
-    const loadImages = async () => {
-      const loadedDimensions = await Promise.all(
-        images.map(
-          (image) =>
-            new Promise((resolve) => {
-              const img = new Image();
-              img.src = image.url;
-              img.onload = () => {
-                resolve({
-                  url: image.url,
-                  width: img.width,
-                  height: img.height,
-                });
-              };
-              img.onerror = () => {
-                resolve({
-                  url: image.url,
-                  width: 0,
-                  height: 0, // Mặc định nếu ảnh không tải được
-                });
-              };
-            })
-        )
-      );
-      setImageDimensions(loadedDimensions);
+    // Hàm tải dữ liệu ảnh từ API
+    const fetchImages = async () => {
+      try {
+        const response = await itemApi.getAll(); // Gọi API lấy danh sách ảnh
+        const images = response.data; // Lấy dữ liệu từ API
+
+        const loadedDimensions = await Promise.all(
+          images.map(
+            (image) =>
+              new Promise((resolve) => {
+                const img = new Image();
+                img.src = image.url;
+                img.onload = () => {
+                  resolve({
+                    url: image.url,
+                    width: img.width,
+                    height: img.height,
+                  });
+                };
+                img.onerror = () => {
+                  resolve({
+                    url: image.url,
+                    width: 0,
+                    height: 0, // Mặc định nếu ảnh không tải được
+                  });
+                };
+              })
+          )
+        );
+
+        setImageDimensions(loadedDimensions); // Lưu thông tin ảnh vào state
+        setLoading(false); // Ẩn trạng thái loading sau khi tải xong
+      } catch (error) {
+        console.error("Lỗi khi tải ảnh:", error);
+        setLoading(false); // Ẩn trạng thái loading nếu gặp lỗi
+      }
     };
 
-    loadImages();
+    fetchImages(); // Gọi hàm tải ảnh khi component được mount
   }, []);
 
   // Breakpoint cho Masonry Layout
@@ -64,22 +63,26 @@ const Home = () => {
     <div className="relative w-screen h-screen flex flex-col bg-gray-100">
       {/* <Nav /> */}
       <div className="p-4">
-        <Masonry
-          breakpointCols={masonryBreakpoints}
-          className="flex -ml-4 w-auto"
-          columnClassName="pl-4 bg-clip-padding"
-        >
-          {imageDimensions.map((image, index) => (
-            <div key={index} className="mb-4">
-              <img
-                src={image.url}
-                alt={`Image ${index}`}
-                className="w-full object-cover rounded-lg"
-                style={{ display: image.width ? "block" : "none" }} // Ẩn ảnh nếu không tải được
-              />
-            </div>
-          ))}
-        </Masonry>
+        {loading ? ( // Hiển thị loading khi đang tải ảnh
+          <p className="text-center text-gray-500">Loading...</p>
+        ) : (
+          <Masonry
+            breakpointCols={masonryBreakpoints}
+            className="flex -ml-4 w-auto"
+            columnClassName="pl-4 bg-clip-padding"
+          >
+            {imageDimensions.map((image, index) => (
+              <div key={index} className="mb-4">
+                <img
+                  src={image.url}
+                  alt={`Image ${index}`}
+                  className="w-full object-cover rounded-lg"
+                  style={{ display: image.width ? "block" : "none" }} // Ẩn ảnh nếu không tải được
+                />
+              </div>
+            ))}
+          </Masonry>
+        )}
       </div>
     </div>
   );

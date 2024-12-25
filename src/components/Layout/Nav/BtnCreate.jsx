@@ -4,7 +4,7 @@ const BtnCreate = () =>{
     return (
         <Link to="/Product/">
           <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
-              Tạo
+              Add
               <span className="ml-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

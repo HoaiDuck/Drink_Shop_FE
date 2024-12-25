@@ -4,6 +4,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { AiOutlineUser, AiOutlineLock, AiOutlineMail } from "react-icons/ai";
 import { Logo } from "@/components/Logo";
 import { useNavigate } from "react-router-dom";
+
 import { Button, Checkbox, Form, Input, message, notification } from "antd";
 import { loginApi } from "@/service";
 
@@ -35,7 +36,6 @@ const LoginForm = () => {
       const getStorageToken = localStorage.getItem("access_token");
       setUser(res.data.user);
       console.log(">>>>CHEC SET Storage Token:", getStorageToken);
-      navigate("/");
     } else {
       messageApi.open({
         type: "destroy",

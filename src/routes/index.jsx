@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+
 import Navbar from "@/components/Layout/Navbar";
 import { LoginForm, Account, Home, Register, UnAuthor } from "@/pages";
 import {
@@ -8,6 +9,8 @@ import {
   Request,
   Error,
   Products,
+  AddToCart,
+  Payment,
 } from "@/pages";
 import { PrivateRoute } from "@/components/Layout"; // Import ProtectedRoute
 import { DashboardLayout } from "@/components/LayoutAdmin";
@@ -34,10 +37,14 @@ const router = createBrowserRouter([
         path: "unauthorized",
         element: <UnAuthor />,
       },
-      //{
-      //  path: "AddToCart",
-      //  element: <AddToCart/>,
-      //y},
+      {
+        path: "AddToCart",
+        element: <AddToCart />,
+      },
+      {
+        path: "Payment",
+        element: <Payment />,
+      },
     ],
   },
   //{
