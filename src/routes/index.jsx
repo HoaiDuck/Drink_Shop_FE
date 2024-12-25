@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Navbar from "@/components/Layout/Navbar";
-import { LoginForm, Account, Home, Register } from "@/pages";
+import { LoginForm, Account, Home, Register, UnAuthor } from "@/pages";
 import {
   Dashboard,
   AccountList,
@@ -9,7 +9,7 @@ import {
   Error,
   Products,
 } from "@/pages";
-
+import { PrivateRoute } from "@/components/Layout"; // Import ProtectedRoute
 import { DashboardLayout } from "@/components/LayoutAdmin";
 
 const router = createBrowserRouter([
@@ -30,6 +30,10 @@ const router = createBrowserRouter([
         path: "Product",
         element: <Products />,
       },
+      {
+        path: "unauthorized",
+        element: <UnAuthor />,
+      },
       //{
       //  path: "AddToCart",
       //  element: <AddToCart/>,
@@ -44,9 +48,14 @@ const router = createBrowserRouter([
     path: "Login",
     element: <LoginForm />,
   },
+
   {
     path: "/Admin",
-    element: <DashboardLayout />,
+    element: (
+      <PrivateRoute action="manage" subject="Dashboard">
+        <DashboardLayout />
+      </PrivateRoute>
+    ),
     children: [
       {
         index: true,

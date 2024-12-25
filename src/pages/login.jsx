@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 // import { AiOutlineUser, AiOutlineLock } from "react-icons/ai";
 // import { BsEye } from "react-icons/bs";
 import { AiOutlineUser, AiOutlineLock, AiOutlineMail } from "react-icons/ai";
@@ -7,35 +7,50 @@ import { useNavigate } from "react-router-dom";
 import { Button, Checkbox, Form, Input, message, notification } from "antd";
 import { loginApi } from "@/service";
 
+import { AuthContext } from "@/context/AuthContext";
 import "./login.css";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const handleClickLogin = () => {
-    navigate("/register");
-  };
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [messageApi, contextHolder] = message.useMessage();
+  const { setUser } = useContext(AuthContext);
+  const setcontext = useContext(AuthContext);
   const onFinish = async (values) => {
     const res = await loginApi.login({
       email: values.email,
       password: values.password,
     });
     console.log(">>>>>CHECK RESPONSE:", res.data);
-    if (res && res.EC === 0) {
-      localStorage.setItem("access_token", res.access_token);
-      messageApi.success("Login Success!");
-      console.log("LOGIN SUCCESS!!!");
+    if (res && res.data.EC === 0) {
+      messageApi.open({
+        type: "success",
+        content: "Login Success!",
+        duration: 2,
+      });
+      localStorage.setItem("access_token", res.data.access_token);
+      // localStorage.setItem("userInfor", res.data.user);
+      const getStorageToken = localStorage.getItem("access_token");
+      setUser(res.data.user);
+      console.log(">>>>CHEC SET Storage Token:", getStorageToken);
       navigate("/");
     } else {
-      messageApi.error("Login Failed!");
+      messageApi.open({
+        type: "destroy",
+        content: "Login Failed!",
+        duration: 2,
+      });
       message.error("LOGIN FAILED!!!", res?.data ?? "Unknown Error!!");
     }
   };
   const onFinishFailed = (errorInfo) => {
-    messageApi.destroy("Login Failed!");
+    messageApi.open({
+      type: "destroy",
+      content: "Login Failed!",
+      duration: 2,
+    });
     console.log("Failed:", errorInfo);
   };
   return (
@@ -124,11 +139,7 @@ const LoginForm = () => {
         <div className="flex justify-between text-sm text-gray-500 mt-4">
           <span>
             Don`t have an account?{" "}
-            <a
-              onClick={handleClickLogin}
-              href="#"
-              className="hover:underline text-blue-500"
-            >
+            <a href="#" className="hover:underline text-blue-500">
               Sign Up
             </a>
           </span>

@@ -1,12 +1,15 @@
 import React from "react";
-
+import { useContext } from "react";
 import BtnAccount from "./Nav/BtnAccount";
 import BtnMenu from "./Nav/BtnMenu";
 import BtnHome from "./Nav/BtnHome";
 import BtnCreate from "./Nav/BtnCreate";
 import { Link, Outlet } from "react-router-dom";
 import { Logo } from "@/components/Logo";
+import { AuthContext } from "@/context/AuthContext";
 const Navbar = () => {
+  const checkcontext = useContext(AuthContext);
+  console.log(">>>>>>>>>>>>>CHECK CONTEXT AT HOME:", checkcontext);
   return (
     <div>
       <nav className="flex items-center justify-between bg-gray-100 p-3 rounded-lg shadow-md sticky top-0 z-50">
@@ -33,7 +36,8 @@ const Navbar = () => {
                 </svg>
               </span>
             </button>
-            <BtnCreate/>
+            <BtnCreate />
+            {/* can author */}
             <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
               Đấu giá
               <span className="ml-2">
@@ -98,6 +102,7 @@ const Navbar = () => {
             </span>
             <span className="sr-only">Tạo mới</span>
           </button>
+          {/* can author */}
           <BtnAccount />
           <BtnMenu />
         </div>

@@ -5,21 +5,13 @@ const loginApi = {
     const url = "login/";
     return instance.post(url, data);
   },
-  get(id) {
+  register(id) {
     const url = `user/Acc/${id}`;
-    return instance.get(url);
+    return instance.post(url);
   },
-  add(data) {
+  forgetPassword(data) {
     const url = "user/Acc";
-    return instance.post(url, data);
-  },
-  update(data) {
-    const url = `user/Acc`;
     return instance.put(url, data);
-  },
-  delete(data) {
-    const url = `user/Acc`;
-    return instance.delete(url, data);
   },
 };
 export default loginApi;
