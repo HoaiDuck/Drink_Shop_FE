@@ -9,65 +9,65 @@ const Products = () => {
             ⬆️
           </div>
           <p className="text-gray-500 mt-4 text-center">
-            Chọn một tệp hoặc kéo thả một tệp vào đây
+            Select a file
           </p>
         </div>
         <button className="mt-4 bg-gray-300 px-6 py-2 rounded-md text-black">
-          Tạo URL
+          Create URL
         </button>
       </div>
       <div className="w-2/3 px-8">
         <div className="mb-4">
-          <label className="block mb-2 font-bold">Tiêu đề</label>
+          <label className="block mb-2 font-bold">Title</label>
           <input
             type="text"
-            placeholder="Thêm tiêu đề"
+            placeholder="Add tittle"
             className="w-full p-2 border rounded-md"
           />
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2 font-bold">Mô tả</label>
+          <label className="block mb-2 font-bold">Description</label>
           <textarea
-            placeholder="Thêm mô tả"
+            placeholder="Add description"
             className="w-full p-2 border rounded-md"
           ></textarea>
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2 font-bold">Liên kết</label>
+          <label className="block mb-2 font-bold">Link</label>
           <input
             type="text"
-            placeholder="Thêm liên kết"
+            placeholder="Add link"
             className="w-full p-2 border rounded-md"
           />
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2 font-bold">Thể loại</label>
+          <label className="block mb-2 font-bold">Category</label>
           <select className="w-full p-2 border rounded-md">
-            <option>Thêm thể loại</option>
+            <option>-</option>
           </select>
         </div>
 
         <div className="flex gap-4 mb-4">
           <div className="w-1/2">
-            <label className="block mb-2 font-bold">Giá</label>
+            <label className="block mb-2 font-bold">Price</label>
             <input
               type="text"
-              placeholder="Thêm giá"
+              placeholder="Add price"
               className="w-full p-2 border rounded-md"
             />
           </div>
           <div className="w-1/2">
-            <label className="block mb-2 font-bold">Mã hàng</label>
+            <label className="block mb-2 font-bold">Product code</label>
             <select className="w-full p-2 border rounded-md">
-              <option>Thêm mã hàng</option>
+              <option>Add product code</option>
             </select>
           </div>
         </div>
         <button className="bg-gray-300 px-6 py-2 rounded-md font-bold">
-          Đăng
+          Post
         </button>
       </div>
     </div>

@@ -15,7 +15,7 @@ const Navbar = () => {
           <div className="flex items-center space-x-4 px-5">
             <BtnHome />
             <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
-              Thể loại
+              Category
               <span className="ml-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +35,7 @@ const Navbar = () => {
             </button>
             <BtnCreate/>
             <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
-              Đấu giá
+              Aution
               <span className="ml-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +75,7 @@ const Navbar = () => {
             </span>
             <input
               type="text"
-              placeholder="Tìm kiếm"
+              placeholder="Search"
               className="px-10 py-2 bg-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400"
             />
           </div>

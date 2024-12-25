@@ -21,9 +21,16 @@ const AddToCart = () => {
                 <span className="text-lg font-bold text-gray-800 mr-2">$140</span>
                 <Rate disabled defaultValue={4} className="text-blue-500" />
               </div>
-              <p className="text-sm text-gray-600">
-                The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.
-              </p>
+              <div className="my-2">
+                <h3 className="font-medium">Category:</h3>
+                <p className="text-sm text-gray-600">Bags & Accessories</p>
+              </div>
+              <div className="my-2">
+                <h3 className="font-medium">Description:</h3>
+                <p className="text-sm text-gray-600">
+                  The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.
+                </p>
+              </div>
               <Button type="primary" className="w-full bg-blue-500 hover:bg-blue-600 mt-4">Add to Cart</Button>
             </div>
           </div>
@@ -32,4 +39,5 @@ const AddToCart = () => {
     </div>
   );
 };
+
 export default AddToCart;
