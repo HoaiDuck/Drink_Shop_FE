@@ -16,6 +16,7 @@ export const AuthProvider = (props) => {
     username: "",
     userRole: [],
   });
+  // const [appLoading, isAppLoading] = useState(false);
 
   // const login = (userData) => setUser(userData);
   // const logout = () => setUser(null);

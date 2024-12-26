@@ -59,7 +59,6 @@ import { accountApi } from "@/service";
 
 const App = () => {
   const { user, setUser } = useContext(AuthContext);
-  const [isUserLoaded, setIsUserLoaded] = useState(false); // Đánh dấu khi dữ liệu user đã sẵn sàng
 
   // Hàm gọi API để lấy thông tin người dùng
   const fetchUserInfor = async () => {
@@ -73,8 +72,10 @@ const App = () => {
           userRole: Number(res.data.role[0]), // Chuyển đổi role sang number
         };
         setUser(dataUser); // Cập nhật trạng thái user
-        setIsUserLoaded(true); // Đánh dấu dữ liệu đã được tải
-        console.log(">>>>>CHECK USER DATA:", dataUser);
+        console.log(">>>>>CHECK API DATA:", dataUser);
+        setTimeout(() => {
+          console.log(">>>>>CHECK USER DATA (after state update):", user);
+        }, 0);
       } else {
         console.error("Invalid user data:", res?.data);
       }
@@ -90,13 +91,11 @@ const App = () => {
 
   // Cập nhật Ability khi dữ liệu user đã sẵn sàng
   useEffect(() => {
-    if (isUserLoaded) {
-      const roleNumber = Number(user.userRole); // Đảm bảo role là number
-      const permissions = defineAbilitiesFor(roleNumber);
-      ability.update(permissions); // Cập nhật Ability
-      console.log("Updated abilities:", permissions);
-    }
-  }, [isUserLoaded, user]);
+    const roleNumber = Number(user.userRole); // Đảm bảo role là number
+    const permissions = defineAbilitiesFor(roleNumber);
+    ability.update(permissions); // Cập nhật Ability
+    console.log("Updated abilities:", permissions);
+  }, []);
 
   return <RouterProvider router={router} />;
 };

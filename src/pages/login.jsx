@@ -36,6 +36,7 @@ const LoginForm = () => {
       const getStorageToken = localStorage.getItem("access_token");
       setUser(res.data.user);
       console.log(">>>>CHEC SET Storage Token:", getStorageToken);
+      navigate("/");
     } else {
       messageApi.open({
         type: "destroy",
