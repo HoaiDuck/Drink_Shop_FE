@@ -1,29 +1,25 @@
 import { instance } from "@/util";
 
-const accountApi = {
+const categoryApi = {
   getAll() {
-    const url = "Acc";
+    const url = "category";
     return instance.get(url);
   },
   get() {
     const url = `user/Acc`;
     return instance.get(url);
   },
-  getByRole() {
-    const url = `user/Account?_id=${2}`;
-    return instance.get(url);
-  },
   add(data) {
-    const url = "user/Acc";
+    const url = "user/sale/category";
     return instance.post(url, data);
   },
   update(data) {
-    const url = `user/Acc`;
+    const url = `user/admin/category`;
     return instance.put(url, data);
   },
   delete(data) {
-    const url = "user/Acc";
+    const url = "user/admin/category";
     return instance.delete(url, data);
   },
 };
-export default accountApi;
+export default categoryApi;

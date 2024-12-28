@@ -7,9 +7,10 @@ import BtnCreate from "./Nav/BtnCreate";
 import { Link, Outlet } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { AuthContext } from "@/context/AuthContext";
-
+import { CheckRole } from "@/components/PrivateComponent";
 const Navbar = () => {
   const checkcontext = useContext(AuthContext);
+
   console.log(">>>>>>>>>>>>>CHECK CONTEXT AT HOME:", checkcontext);
   return (
     <div>
@@ -58,6 +59,7 @@ const Navbar = () => {
                 </svg>
               </span>
             </button>
+
             <Link to="/Admin">
               <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
                 Admin

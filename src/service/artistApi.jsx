@@ -1,16 +1,12 @@
 import { instance } from "@/util";
 
-const accountApi = {
+const artistApi = {
   getAll() {
-    const url = "Acc";
+    const url = "user/sale/item";
     return instance.get(url);
   },
   get() {
     const url = `user/Acc`;
-    return instance.get(url);
-  },
-  getByRole() {
-    const url = `user/Account?_id=${2}`;
     return instance.get(url);
   },
   add(data) {
@@ -26,4 +22,4 @@ const accountApi = {
     return instance.delete(url, data);
   },
 };
-export default accountApi;
+export default artistApi;

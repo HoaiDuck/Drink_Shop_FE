@@ -1,75 +1,95 @@
-import React, { useState } from "react";
-import { itemApi } from "@/service"; // Đường dẫn này điều chỉnh theo cấu trúc thư mục của bạn.
+import React, { useEffect, useState } from "react";
+import { itemApi, categoryApi, accountApi } from "@/service"; // Đường dẫn này điều chỉnh theo cấu trúc thư mục của bạn.
 
-const ImageUpload = ({ onImageSelect }) => {
-  const [previewImage, setPreviewImage] = useState(null);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-        onImageSelect(reader.result); // Truyền URL Base64 lên component cha
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  return (
-    <div className="w-64 h-96 bg-gray-300 flex flex-col justify-center items-center rounded-md overflow-hidden">
-      {previewImage ? (
-        <img
-          src={previewImage}
-          alt="Preview"
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <div className="flex flex-col items-center">
-          <div className="flex justify-center items-center w-12 h-12 bg-black rounded-full text-white">
-            ⬆️
-          </div>
-          <p className="text-gray-500 mt-4 text-center">Select a file</p>
-        </div>
-      )}
-      <input
-        type="file"
-        accept="image/*"
-        className="mt-4"
-        onChange={handleFileChange}
-      />
-    </div>
-  );
-};
+import { Upload } from "antd";
+import ImgCrop from "antd-img-crop";
+import { Selected } from "@/components/Product";
 
 const Products = () => {
+  const [categoryData, setCategoryData] = useState();
+  const [selectCategory, setSelectCategory] = useState();
+  const [artistData, setArtistData] = useState();
+  const [selectArtist, setSelectArtist] = useState();
+
   const [formData, setFormData] = useState({
-    title: "",
+    name: "",
     description: "",
     artist: "",
     category: "",
     price: "",
-    productCode: "",
-    image: null, // Thêm trường lưu ảnh
+    url: null, // Thêm trường lưu ảnh
   });
+  const listCategory = async () => {
+    const res = await categoryApi.getAll();
+    const listCate = res.data.map((item) => ({
+      Name: item.Name,
+      _id: item._id,
+    }));
+    setCategoryData(listCate);
+    console.log(">>>>CHECK CATEGORY:", res.data);
+  };
+  const listArtist = async () => {
+    const res = await accountApi.getByRole(2);
+    const listCate = res.data.map((item) => ({
+      Name: item.username,
+      _id: item._id,
+    }));
+    setArtistData(listCate);
+    console.log(">>>>CHECK Artist:", listCate);
+  };
+  useEffect(() => {
+    listCategory();
+    listArtist();
+  }, []);
+  useEffect(() => {
+    console.log(">>>>CHECK CateData:", categoryData);
+  }, [categoryData]);
+  const handleChangeCategory = (selected) => {
+    console.log(`selected (At pages) ${selected}`);
+    setSelectCategory(selected);
+  };
+  const handleChangeArtist = (selected) => {
+    console.log(`selected Artist (At pages) ${selected}`);
+    setSelectArtist(selected);
+  };
   const [loading, setLoading] = useState(false); // Trạng thái gửi dữ liệu
 
+  //antt upload function
+  const [fileList, setFileList] = useState([
+    {
+      uid: "-1",
+      name: "image.png",
+      status: "done",
+      url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
+    },
+  ]);
+  const onChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
+  const onPreview = async (file) => {
+    let src = file.url;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file.originFileObj);
+        reader.onload = () => resolve(reader.result);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
   // Xử lý thay đổi form
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Xử lý ảnh được chọn
-  const handleImageSelect = (image) => {
-    setFormData({ ...formData, image });
-  };
-
   // Xác thực dữ liệu
   const validateForm = () => {
-    const { title, description, artist, category, price, productCode } =
-      formData;
-    if (!title || !description || !artist || !category || !price || !productCode) {
+    const { name, description, artist, category, price } = formData;
+    if (!name || !description || !artist || !category || !price) {
       alert("Vui lòng nhập đầy đủ thông tin.");
       return false;
     }
@@ -94,7 +114,7 @@ const Products = () => {
         category: "",
         price: "",
         productCode: "",
-        image: null,
+        url: null,
       });
     } catch (error) {
       console.error("Lỗi khi thêm sản phẩm:", error);
@@ -107,16 +127,26 @@ const Products = () => {
   return (
     <div className="flex justify-center items-center p-8">
       <div className="w-1/3 flex flex-col items-center border p-4">
-        <ImageUpload onImageSelect={handleImageSelect} />
+        <ImgCrop rotationSlider>
+          <Upload
+            action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+            listType="picture-card"
+            fileList={fileList}
+            onChange={onChange}
+            onPreview={onPreview}
+          >
+            {fileList.length < 5 && "+ Upload"}
+          </Upload>
+        </ImgCrop>
       </div>
       <div className="w-2/3 px-8">
         <div className="mb-4">
-          <label className="block mb-2 font-bold">Title</label>
+          <label className="block mb-2 font-bold">Name</label>
           <input
             type="text"
-            name="title"
+            name="name"
             placeholder="Add title"
-            value={formData.title}
+            value={formData.name}
             onChange={handleChange}
             className="w-full p-2 border rounded-md"
           />
@@ -135,29 +165,15 @@ const Products = () => {
 
         <div className="mb-4">
           <label className="block mb-2 font-bold">Artist</label>
-          <input
-            type="text"
-            name="artist"
-            placeholder="Artist name"
-            value={formData.artist}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
-          />
+          <Selected data={artistData} setSelect={handleChangeArtist}></Selected>
         </div>
 
         <div className="mb-4">
           <label className="block mb-2 font-bold">Category</label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
-          >
-            <option value="">-</option>
-            <option value="Art">Art</option>
-            <option value="Music">Music</option>
-            <option value="Books">Books</option>
-          </select>
+          <Selected
+            data={categoryData}
+            setSelect={handleChangeCategory}
+          ></Selected>
         </div>
 
         <div className="flex gap-4 mb-4">
@@ -171,19 +187,6 @@ const Products = () => {
               onChange={handleChange}
               className="w-full p-2 border rounded-md"
             />
-          </div>
-          <div className="w-1/2">
-            <label className="block mb-2 font-bold">Product code</label>
-            <select
-              name="productCode"
-              value={formData.productCode}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value="">Add product code</option>
-              <option value="P001">P001</option>
-              <option value="P002">P002</option>
-            </select>
           </div>
         </div>
         <button

@@ -14,7 +14,6 @@ import {
 } from "@/pages";
 import { PrivateRoute } from "@/components/Layout"; // Import ProtectedRoute
 import { DashboardLayout } from "@/components/LayoutAdmin";
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -31,7 +30,11 @@ const router = createBrowserRouter([
       },
       {
         path: "Product",
-        element: <Products />,
+        element: (
+          <PrivateRoute action="manage" subject="Item">
+            <Products />
+          </PrivateRoute>
+        ),
       },
       {
         path: "unauthorized",
