@@ -2,7 +2,7 @@ import { instance } from "@/util";
 
 const itemApi = {
   getAll(data) {
-    const url = "user/sale/item";
+    const url = "item";
     return instance.get(url, data);
   },
   add(data) {
