@@ -9,8 +9,9 @@ import {
   Request,
   Error,
   Products,
-  AddToCart,
-  Payment,
+  DetailItem,
+  Cart,
+  Bill,
 } from "@/pages";
 import { PrivateRoute } from "@/components/Layout"; // Import ProtectedRoute
 import { DashboardLayout } from "@/components/LayoutAdmin";
@@ -41,13 +42,17 @@ const router = createBrowserRouter([
         element: <UnAuthor />,
       },
       {
-        path: "AddToCart",
-        element: <AddToCart />,
+        path: "DetailItem",
+        element: <DetailItem />,
       },
       {
-        path: "Payment",
-        element: <Payment />,
+        path: "Cart",
+        element: <Cart />,
       },
+      {
+        path: "Bill",
+        element: <Bill/>,
+      }
     ],
   },
   //{

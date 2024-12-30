@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Rate, Button } from 'antd';
 import 'antd/dist/reset.css';
 
-const AddToCart = () => {
+const DetailItem = () => {
   return (
     <div className="flex flex-col items-center p-6 bg-gray-50 min-h-screen">
       <Card bordered={false} className="w-full max-w-4xl bg-white shadow-md">
@@ -44,4 +44,4 @@ const AddToCart = () => {
   );
 };
 
-export default AddToCart;
+export default DetailItem;
