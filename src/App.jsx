@@ -68,6 +68,7 @@ const App = () => {
         const dataUser = {
           _id: res.data.data._id,
           email: res.data.data.email,
+          cart: res.data.data.cart,
           username: res.data.data.username,
           userRole: Number(res.data.role[0]), // Chuyển đổi role sang number
         };

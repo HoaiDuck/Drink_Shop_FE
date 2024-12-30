@@ -10,7 +10,8 @@ export { default as Error } from "@/pages/ErrorHandle";
 export { default as Products } from "@/pages/Products";
 
 export { default as UnAuthor } from "@/pages/UnAuthorized";
-
-export { default as DetailItem } from "@/pages/DetailItem";
-export { default as Cart } from "@/pages/Cart";
+export { default as LayoutStructure } from "@/pages/LayoutStructure";
 export { default as Bill } from "@/pages/Bill";
+
+export { default as ItemDetails } from "@/pages/ItemDetail";
+export { default as Cart } from "@/pages/Cart";

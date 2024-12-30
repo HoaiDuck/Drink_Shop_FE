@@ -1,7 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import Navbar from "@/components/Layout/Navbar";
-import { LoginForm, Account, Home, Register, UnAuthor } from "@/pages";
+import {
+  LoginForm,
+  Account,
+  Home,
+  Register,
+  UnAuthor,
+  LayoutStructure,
+} from "@/pages";
 import {
   Dashboard,
   AccountList,
@@ -9,16 +16,16 @@ import {
   Request,
   Error,
   Products,
-  DetailItem,
-  Cart,
   Bill,
+  ItemDetails,
+  Cart,
 } from "@/pages";
 import { PrivateRoute } from "@/components/Layout"; // Import ProtectedRoute
 import { DashboardLayout } from "@/components/LayoutAdmin";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navbar />,
+    element: <LayoutStructure />,
     errorElement: <Error />,
     children: [
       {
@@ -42,8 +49,8 @@ const router = createBrowserRouter([
         element: <UnAuthor />,
       },
       {
-        path: "DetailItem",
-        element: <DetailItem />,
+        path: "itemDetails",
+        element: <ItemDetails />,
       },
       {
         path: "Cart",
@@ -51,8 +58,8 @@ const router = createBrowserRouter([
       },
       {
         path: "Bill",
-        element: <Bill/>,
-      }
+        element: <Bill />,
+      },
     ],
   },
   //{

@@ -5,6 +5,7 @@ import { ability } from "@/ability";
 export const AuthContext = createContext({
   _id: "",
   email: "",
+  cart: "",
   username: "",
   userRole: "",
 });
@@ -14,6 +15,7 @@ export const AuthProvider = (props) => {
     _id: 0,
     email: "",
     username: "",
+    cart: "",
     userRole: [],
   });
   // const [appLoading, isAppLoading] = useState(false);
