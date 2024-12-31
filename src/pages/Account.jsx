@@ -1,10 +1,16 @@
 import React from "react";
-
+import { AntDesignOutlined } from "@ant-design/icons";
+import { Avatar } from "antd";
 const Account = () => {
   return (
     <div className="relative w-screen h-screen flex flex-col bg-gray-100">
       <div className="flex-grow flex flex-col items-center justify-center">
-        <div className="w-24 h-24 rounded-full bg-gray-300"></div>
+        <Avatar
+          className="w-24 h-24 rounded-full bg-gray-300"
+          size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
+          icon={<AntDesignOutlined />}
+        />
+
         <h1 className="text-2xl font-bold mt-4">Duck</h1>
         <p className="text-sm text-gray-500">Thành viên VIP</p>
 
@@ -13,7 +19,7 @@ const Account = () => {
             Follower
           </button>
           <button className="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300">
-            Chỉnh sửa tài khoản
+            Modify Account
           </button>
           <button className="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300">
             Chia sẻ
@@ -22,10 +28,10 @@ const Account = () => {
 
         <div className="flex gap-8 mt-8 text-gray-600">
           <a href="#" className="underline">
-            Đã tạo
+            Work Space
           </a>
           <a href="#" className="underline">
-            Đã xem
+            Personal Bag
           </a>
         </div>
 

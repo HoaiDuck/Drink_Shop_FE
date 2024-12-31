@@ -17,7 +17,7 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [messageApi, contextHolder] = message.useMessage();
-  const { setUser } = useContext(AuthContext);
+  const { setUser, fetchUserInfor } = useContext(AuthContext);
   const setcontext = useContext(AuthContext);
   const onFinish = async (values) => {
     const res = await loginApi.login({
@@ -35,7 +35,9 @@ const LoginForm = () => {
       // localStorage.setItem("userInfor", res.data.user);
       const getStorageToken = localStorage.getItem("access_token");
       setUser(res.data.user);
+      await new Promise((resolve) => setTimeout(resolve, 0));
       console.log(">>>>CHEC SET Storage Token:", getStorageToken);
+      fetchUserInfor();
       navigate("/");
     } else {
       messageApi.open({

@@ -58,36 +58,13 @@ import { AuthContext } from "@/context/AuthContext";
 import { accountApi } from "@/service";
 
 const App = () => {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser, fetchUserInfor } = useContext(AuthContext);
 
-  // Hàm gọi API để lấy thông tin người dùng
-  const fetchUserInfor = async () => {
-    try {
-      const res = await accountApi.get();
-      if (res?.data?.data && Array.isArray(res?.data?.role)) {
-        const dataUser = {
-          _id: res.data.data._id,
-          email: res.data.data.email,
-          cart: res.data.data.cart,
-          username: res.data.data.username,
-          userRole: Number(res.data.role[0]), // Chuyển đổi role sang number
-        };
-        setUser(dataUser); // Cập nhật trạng thái user
-        console.log(">>>>>CHECK API DATA:", dataUser);
-        setTimeout(() => {
-          console.log(">>>>>CHECK USER DATA (after state update):", user);
-        }, 0);
-      } else {
-        console.error("Invalid user data:", res?.data);
-      }
-    } catch (error) {
-      console.error("Error fetching user info:", error);
-    }
-  };
-
-  // Gọi API khi ứng dụng load lần đầu
   useEffect(() => {
-    fetchUserInfor();
+    const accessToken = localStorage.getItem("access_token");
+    if (accessToken) {
+      fetchUserInfor(); // Fetch dữ liệu người dùng nếu có access token
+    }
   }, []);
 
   // Cập nhật Ability khi dữ liệu user đã sẵn sàng
