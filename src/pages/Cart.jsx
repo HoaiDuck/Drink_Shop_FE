@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "antd/dist/reset.css";
 import { itemApi, cartApi } from "@/service";
 import { AuthContext } from "@/context/AuthContext";
+
 const Cart = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
@@ -47,8 +48,17 @@ const Cart = () => {
     );
   };
 
-  const handleRemoveItem = (id) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item._id !== id));
+  const handleRemoveItem = async (id) => {
+    try {
+      // Gọi API để xóa item khỏi giỏ hàng trên server
+      await cartApi.update({ _id: user.cart, item: id, type: "Delete" });
+
+      // Cập nhật state để loại bỏ item khỏi danh sách hiển thị
+      setCartItems((prevItems) => prevItems.filter((item) => item._id !== id));
+    } catch (error) {
+      console.error("Lỗi khi xóa item khỏi giỏ hàng:", error);
+      setError("Không thể xóa item khỏi giỏ hàng. Vui lòng thử lại sau.");
+    }
   };
 
   const totalCheckedAmount = cartItems

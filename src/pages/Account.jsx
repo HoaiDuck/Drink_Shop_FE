@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { AntDesignOutlined } from "@ant-design/icons";
 import { Avatar } from "antd";
+import { AuthContext } from "@/context"; // Điều chỉnh đường dẫn tới AuthContext
+import { Link, Outlet } from "react-router-dom"; // Import Outlet
+
 const Account = () => {
+  const { user } = useContext(AuthContext);
+
   return (
     <div className="relative w-screen h-screen flex flex-col bg-gray-100">
       <div className="flex-grow flex flex-col items-center justify-center">
@@ -11,8 +16,10 @@ const Account = () => {
           icon={<AntDesignOutlined />}
         />
 
-        <h1 className="text-2xl font-bold mt-4">Duck</h1>
-        <p className="text-sm text-gray-500">Thành viên VIP</p>
+        <h1 className="text-2xl font-bold mt-4">{user.username}</h1>
+        <p className="text-sm text-gray-500">
+          Lv{user.level}: {user.bio}
+        </p>
 
         <div className="flex gap-4 mt-6">
           <button className="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300">
@@ -27,16 +34,21 @@ const Account = () => {
         </div>
 
         <div className="flex gap-8 mt-8 text-gray-600">
-          <a href="#" className="underline">
+          <Link to="/Account/Workspace" className="underline">
             Work Space
-          </a>
+          </Link>
           <a href="#" className="underline">
             Personal Bag
           </a>
         </div>
 
+        {/* Đặt Outlet ở đây để hiển thị Workspace */}
+        <div className="w-full mt-8">
+          <Outlet />
+        </div>
+
         <div className="absolute top-20 right-4 bg-gray-200 px-4 py-2 rounded-lg shadow">
-          <span>Coin:</span> <span className="font-bold">20000</span>
+          <span>Coin:</span> <span className="font-bold">{user.coin}</span>
         </div>
       </div>
     </div>

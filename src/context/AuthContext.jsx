@@ -9,6 +9,9 @@ export const AuthContext = createContext({
   cart: "",
   username: "",
   userRole: "",
+  coin: "",
+  level: "",
+  bio: "",
 });
 
 export const AuthProvider = (props) => {
@@ -18,6 +21,9 @@ export const AuthProvider = (props) => {
     username: "",
     cart: "",
     userRole: [],
+    coin: 0,
+    level: 0,
+    bio: " ",
   });
   // const [appLoading, isAppLoading] = useState(false);
 
@@ -33,6 +39,9 @@ export const AuthProvider = (props) => {
           cart: res.data.data.cart,
           username: res.data.data.username,
           userRole: Number(res.data.role[0]), // Chuyển đổi role sang number
+          coin: res.data.data.coin,
+          level: res.data.data.level,
+          bio: res.data.data.bio,
         };
         setUser(dataUser); // Cập nhật trạng thái user
         console.log(">>>>>CHECK API DATA:", dataUser);

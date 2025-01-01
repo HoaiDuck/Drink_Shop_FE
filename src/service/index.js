@@ -5,3 +5,4 @@ export { default as loginApi } from "@/service/loginApi";
 export { default as categoryApi } from "@/service/categoryApi";
 export { default as artistApi } from "@/service/artistApi";
 export { default as cartApi } from "@/service/cartApi";
+export { default as userItemApi } from "@/service/userItemApi";

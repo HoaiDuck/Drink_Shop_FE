@@ -15,3 +15,5 @@ export { default as Bill } from "@/pages/Bill";
 
 export { default as ItemDetails } from "@/pages/ItemDetail";
 export { default as Cart } from "@/pages/Cart";
+export { default as Workspace } from "@/pages/Workspace.jsx";
+export { default as PersonalBag } from "@/pages/PersonalBag";

@@ -19,6 +19,8 @@ import {
   Bill,
   ItemDetails,
   Cart,
+  Workspace,
+  PersonalBag,
 } from "@/pages";
 import { PrivateRoute } from "@/components/Layout"; // Import ProtectedRoute
 import { DashboardLayout } from "@/components/LayoutAdmin";
@@ -35,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "Account",
         element: <Account />,
+        children: [
+          { path: "Workspace", element: <Workspace /> },
+          { path: "PersonalBag", element: <PersonalBag /> },
+        ],
       },
       {
         path: "Product",

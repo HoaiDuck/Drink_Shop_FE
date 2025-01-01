@@ -18,6 +18,7 @@ const Home = () => {
         const loadedDimensions = images.map((image) => ({
           id: image._id, // Thêm id của item để sử dụng khi thêm vào giỏ hàng
           url: `http://localhost:8070/images/${path.basename(image.url)}`,
+
           name: image.name,
           description: image.description,
           artist: image.artist,
@@ -47,7 +48,7 @@ const Home = () => {
 
       if (isConfirmed) {
         // Gọi API để thêm item vào giỏ hàng
-        await cartApi.update({ _id: user.cart, item: item.id });
+        await cartApi.update({ _id: user.cart, item: item.id, type: "Add" });
         message.success(`Đã thêm "${item.name}" vào giỏ hàng!`);
       }
     } catch (error) {
