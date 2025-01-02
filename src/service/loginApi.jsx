@@ -5,9 +5,9 @@ const loginApi = {
     const url = "login/";
     return instance.post(url, data);
   },
-  register(id) {
-    const url = `user/Acc/${id}`;
-    return instance.post(url);
+  register(data) {
+    const url = "Acc";
+    return instance.post(url, data);
   },
   forgetPassword(data) {
     const url = "user/Acc";

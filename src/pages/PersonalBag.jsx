@@ -3,15 +3,16 @@ import React, { useEffect, useState, useContext } from "react";
 import { accountApi } from "@/service";
 import { AuthContext } from "@/context";
 import path from "path-browserify";
+
 const PersonalBag = () => {
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
+
   useEffect(() => {
     const fetchUserItems = async () => {
       try {
-        // Gọi API để lấy danh sách các item của người dùng
         const userItemsResponse = await userItemApi.get({
           _id: user._id,
           type: 0,
@@ -24,7 +25,7 @@ const PersonalBag = () => {
         );
         const userItems = userItemsResponse.data;
         console.log(">>>CHECK user item:", userItems);
-        // Lấy thông tin chi tiết của từng item
+
         const itemsDetails = await Promise.all(
           userItems.map(async (userItem) => {
             const itemResponse = await itemApi.getById(userItem.item);
@@ -52,7 +53,24 @@ const PersonalBag = () => {
 
     fetchUserItems();
   }, [user]);
-
+  const handleImageClick = async (imageUrl, title) => {
+    try {
+      const response = await fetch(imageUrl); // Tải ảnh
+      if (!response.ok) throw new Error("Lỗi tải ảnh");
+      const blob = await response.blob(); // Chuyển dữ liệu ảnh sang Blob
+      const url = window.URL.createObjectURL(blob); // Tạo URL tạm thời từ Blob
+      const link = document.createElement("a"); // Tạo thẻ <a>
+      link.href = url; // Gán URL vào href
+      link.download = title || "download"; // Đặt tên file tải về
+      document.body.appendChild(link); // Gắn thẻ <a> vào DOM
+      link.click(); // Kích hoạt sự kiện click
+      document.body.removeChild(link); // Xóa thẻ <a> khỏi DOM sau khi tải xong
+      window.URL.revokeObjectURL(url); // Giải phóng URL tạm thời
+    } catch (error) {
+      console.error("Lỗi khi tải ảnh:", error);
+      alert("Không thể tải ảnh. Vui lòng thử lại sau.");
+    }
+  };
   if (loading) {
     return null;
   }
@@ -73,7 +91,8 @@ const PersonalBag = () => {
             <img
               src={artwork.imageUrl}
               alt={artwork.title}
-              className="w-full h-48 object-cover"
+              className="w-full h-48 object-cover cursor-pointer"
+              onClick={() => handleImageClick(artwork.imageUrl, artwork.title)}
             />
             <div className="p-4">
               <h2 className="text-xl font-semibold mb-2">{artwork.title}</h2>

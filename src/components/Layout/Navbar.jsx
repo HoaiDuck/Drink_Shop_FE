@@ -8,7 +8,47 @@ import { Link } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { AuthContext } from "@/context/AuthContext";
 import { CheckRole } from "@/components/PrivateComponent";
-const Navbar = () => {
+import { Button, Dropdown, Space } from "antd";
+
+const Navbar = (cateData) => {
+  const items = [
+    {
+      key: "1",
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www.antgroup.com"
+        >
+          1st menu item
+        </a>
+      ),
+    },
+    {
+      key: "2",
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www.aliyun.com"
+        >
+          2nd menu item
+        </a>
+      ),
+    },
+    {
+      key: "3",
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www.luohanacademy.com"
+        >
+          3rd menu item
+        </a>
+      ),
+    },
+  ];
   const checkcontext = useContext(AuthContext);
 
   console.log(">>>>>>>>>>>>>CHECK CONTEXT AT HOME:", checkcontext);
@@ -38,6 +78,34 @@ const Navbar = () => {
                 </svg>
               </span>
             </button>
+            <Dropdown
+              className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400"
+              menu={{
+                items,
+              }}
+              placement="bottomRight"
+              arrow
+            >
+              <Button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
+                Category
+                <span className="ml-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    />
+                  </svg>
+                </span>
+              </Button>
+            </Dropdown>
             <BtnCreate />
             {/* can author */}
             <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">

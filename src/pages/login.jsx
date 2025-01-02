@@ -3,7 +3,7 @@ import React, { useEffect, useState, useContext } from "react";
 // import { BsEye } from "react-icons/bs";
 import { AiOutlineUser, AiOutlineLock, AiOutlineMail } from "react-icons/ai";
 import { Logo } from "@/components/Logo";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import { Button, Checkbox, Form, Input, message, notification } from "antd";
 import { loginApi } from "@/service";
@@ -142,9 +142,9 @@ const LoginForm = () => {
         <div className="flex justify-between text-sm text-gray-500 mt-4">
           <span>
             Don`t have an account?{" "}
-            <a href="#" className="hover:underline text-blue-500">
+            <Link to="/Register" className="hover:underline text-blue-500">
               Sign Up
-            </a>
+            </Link>
           </span>
 
           <a href="#" className="hover:underline">
