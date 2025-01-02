@@ -37,9 +37,10 @@ const Account = () => {
           <Link to="/Account/Workspace" className="underline">
             Work Space
           </Link>
-          <a href="#" className="underline">
+
+          <Link to="/Account/PersonalBag" className="underline">
             Personal Bag
-          </a>
+          </Link>
         </div>
 
         {/* Đặt Outlet ở đây để hiển thị Workspace */}

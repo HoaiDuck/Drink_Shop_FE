@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Card, Button, List, Checkbox } from "antd";
+import { Card, Button, List, Checkbox, Modal, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import "antd/dist/reset.css";
-import { itemApi, cartApi } from "@/service";
+import { itemApi, cartApi, userItemApi, accountApi } from "@/service";
 import { AuthContext } from "@/context/AuthContext";
 
 const Cart = () => {
@@ -11,6 +11,8 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
@@ -69,8 +71,71 @@ const Cart = () => {
     // Lọc các sản phẩm đã được chọn (checked)
     const selectedItems = cartItems.filter((item) => item.checked);
 
-    // Chuyển hướng đến trang Bill và truyền dữ liệu sản phẩm đã chọn
-    navigate("/Bill", { state: { selectedItems } });
+    // Kiểm tra nếu không có sản phẩm nào được chọn
+    if (selectedItems.length === 0) {
+      return;
+    }
+
+    // Hiển thị Modal xác nhận
+    setIsModalVisible(true);
+  };
+
+  const checkCoinBalance = (totalAmount) => {
+    return user.coin >= totalAmount;
+  };
+
+  const handleConfirmCheckout = async () => {
+    try {
+      // Lọc các sản phẩm đã được chọn (checked)
+      const selectedItems = cartItems.filter((item) => item.checked);
+
+      // Tính tổng số tiền cần thanh toán
+      const totalAmount = selectedItems.reduce(
+        (total, item) => total + parseFloat(item.price.$numberDecimal),
+        0
+      );
+
+      // Kiểm tra số dư coin của người dùng
+      if (!checkCoinBalance(totalAmount)) {
+        message.error("Số dư coin không đủ để thanh toán.");
+        setIsModalVisible(false); // Đóng Modal
+        return;
+      }
+
+      // Cập nhật số dư coin của người dùng
+      const updatedCoin = user.coin - totalAmount;
+      await accountApi.update({
+        _id: user._id,
+        email: user.email,
+        cart: user.cart,
+        username: user.username,
+        userRole: user.userRole,
+        coin: updatedCoin,
+        level: user.level,
+        bio: user.bio,
+      });
+
+      // Gọi API userItem.add() cho từng sản phẩm được chọn
+      await Promise.all(
+        selectedItems.map(async (item) => {
+          const addUserItem = await userItemApi.add({
+            userId: user._id,
+            item: item._id,
+            type: 0,
+          });
+          console.log(">>>CHECK ADD user Item:", addUserItem);
+        })
+      );
+
+      // Đóng Modal
+      setIsModalVisible(false);
+
+      // Chuyển hướng đến trang PersonalBag
+      navigate("/Account/PersonalBag");
+    } catch (error) {
+      console.error("Lỗi khi thanh toán:", error);
+      setError("Không thể thanh toán. Vui lòng thử lại sau.");
+    }
   };
 
   return (
@@ -134,6 +199,18 @@ const Cart = () => {
           </>
         )}
       </Card>
+
+      {/* Modal xác nhận thanh toán */}
+      <Modal
+        title="Xác nhận thanh toán"
+        visible={isModalVisible}
+        onOk={handleConfirmCheckout}
+        onCancel={() => setIsModalVisible(false)}
+        okText="Đồng ý"
+        cancelText="Hủy"
+      >
+        <p>Bạn có chắc chắn muốn thanh toán các sản phẩm đã chọn?</p>
+      </Modal>
     </div>
   );
 };

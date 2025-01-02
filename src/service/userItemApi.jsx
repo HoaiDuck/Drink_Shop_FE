@@ -8,7 +8,7 @@ const userItemApi = {
   },
 
   add(data) {
-    const url = "user/Acc";
+    const url = "user/sale/userItem";
     return instance.post(url, data);
   },
   update(data) {

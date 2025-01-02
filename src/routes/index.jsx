@@ -38,8 +38,8 @@ const router = createBrowserRouter([
         path: "Account",
         element: <Account />,
         children: [
-          { path: "Workspace", element: <Workspace /> },
           { path: "PersonalBag", element: <PersonalBag /> },
+          { path: "Workspace", element: <Workspace /> },
         ],
       },
       {

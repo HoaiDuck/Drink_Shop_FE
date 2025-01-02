@@ -14,9 +14,14 @@ const PersonalBag = () => {
         // Gọi API để lấy danh sách các item của người dùng
         const userItemsResponse = await userItemApi.get({
           _id: user._id,
-          type: 1,
+          type: 0,
         });
-        console.log(">>>CHECK workspace:", userItemsResponse);
+        console.log(
+          ">>>CHECK personal bag of user has id:",
+          user._id,
+          ":",
+          user
+        );
         const userItems = userItemsResponse.data;
         console.log(">>>CHECK user item:", userItems);
         // Lấy thông tin chi tiết của từng item
@@ -46,10 +51,10 @@ const PersonalBag = () => {
     };
 
     fetchUserItems();
-  }, []);
+  }, [user]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   if (error) {
@@ -58,7 +63,7 @@ const PersonalBag = () => {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-8">Workspace</h1>
+      <h1 className="text-3xl font-bold mb-8">Bag</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {artworks.map((artwork) => (
           <div
