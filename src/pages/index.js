@@ -17,3 +17,5 @@ export { default as ItemDetails } from "@/pages/ItemDetail";
 export { default as Cart } from "@/pages/Cart";
 export { default as Workspace } from "@/pages/Workspace.jsx";
 export { default as PersonalBag } from "@/pages/PersonalBag";
+export { default as Property } from "@/pages/Property";
+export { default as CategoryPage } from "@/pages/Category";

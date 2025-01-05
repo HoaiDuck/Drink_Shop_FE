@@ -21,6 +21,8 @@ import {
   Cart,
   Workspace,
   PersonalBag,
+  Property,
+  CategoryPage,
 } from "@/pages";
 import { PrivateRoute } from "@/components/Layout"; // Import ProtectedRoute
 import { DashboardLayout } from "@/components/LayoutAdmin";
@@ -50,6 +52,15 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "Property",
+        element: <Property />,
+      },
+      {
+        path: "category/:categoryId",
+        element: <CategoryPage />,
+      },
+
       {
         path: "unauthorized",
         element: <UnAuthor />,

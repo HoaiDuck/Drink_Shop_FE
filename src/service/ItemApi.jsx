@@ -5,8 +5,12 @@ const itemApi = {
     const url = "item";
     return instance.get(url, data);
   },
-  getById(_id) {
-    const url = `user/sale/item?_id=${_id}`;
+  getById(data) {
+    const url = `user/sale/item?_id=${data._id}&getArtistId=${data.getArtistId}`;
+    return instance.get(url);
+  },
+  getWithCategory(_id) {
+    const url = `item/Category?_id=${_id}`;
     return instance.get(url);
   },
   add(data) {

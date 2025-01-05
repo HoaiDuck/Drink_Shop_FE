@@ -2,7 +2,14 @@ import React, { useState, useEffect, useContext } from "react";
 import { Card, Button, List, Checkbox, Modal, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import "antd/dist/reset.css";
-import { itemApi, cartApi, userItemApi, accountApi } from "@/service";
+import {
+  itemApi,
+  cartApi,
+  userItemApi,
+  accountApi,
+  billApi,
+  incomeApi,
+} from "@/service";
 import { AuthContext } from "@/context/AuthContext";
 
 const Cart = () => {
@@ -23,7 +30,10 @@ const Cart = () => {
         // Lấy thông tin chi tiết của từng item trong giỏ hàng
         const itemsWithDetails = await Promise.all(
           cartData.item.map(async (itemId) => {
-            const itemResponse = await itemApi.getById(itemId);
+            const itemResponse = await itemApi.getById({
+              _id: itemId,
+              getArtistId: 1,
+            });
             console.log(">>>>>CHECK Cart ITEM:", itemResponse);
             return itemResponse.data;
           })
@@ -115,6 +125,12 @@ const Cart = () => {
         bio: user.bio,
       });
 
+      await billApi.add({
+        cartId: user.cart,
+        paymentMethod: "None",
+        status: "Paid",
+        totalAmount: totalAmount,
+      });
       // Gọi API userItem.add() cho từng sản phẩm được chọn
       await Promise.all(
         selectedItems.map(async (item) => {
@@ -123,6 +139,29 @@ const Cart = () => {
             item: item._id,
             type: 0,
           });
+          await cartApi.update({
+            _id: user.cart,
+            item: item._id,
+            type: "Delete",
+          });
+          const countArtist = item.artist.length;
+          console.log(
+            ">>>CHECK ARTIST:",
+            item.artist,
+            "Total:",
+            item.price.$numberDecimal,
+            "item:",
+            item._id
+          );
+          item.artist.map(async (artist) => {
+            const incomePost = await incomeApi.add({
+              item: item._id,
+              totalIncome: item.price.$numberDecimal / countArtist,
+              artistId: artist,
+            });
+            console.log(">>>CHECK INCOME:", incomePost);
+          });
+
           console.log(">>>CHECK ADD user Item:", addUserItem);
         })
       );
@@ -173,7 +212,7 @@ const Cart = () => {
                     title={<span className="font-medium">{item.name}</span>}
                     description={
                       <>
-                        <p>Artist: {item?.artist?.join(", ")}</p>
+                        {/* <p>Artist: {item?.artist?.join(", ")}</p> */}
                         <p>Category: {item?.category?.join(", ")}</p>
                         <p>Price: ${item?.price?.$numberDecimal}</p>
                       </>

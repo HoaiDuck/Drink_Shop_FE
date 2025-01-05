@@ -9,6 +9,7 @@ const LayoutStructure = () => {
     const listCate = res.data.map((item) => ({
       Name: item.Name,
       _id: item._id,
+      Description: item.Description,
     }));
     setCategoryData(listCate);
     console.log(">>>>CHECK CATEGORY:", res.data);

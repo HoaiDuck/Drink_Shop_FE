@@ -6,3 +6,5 @@ export { default as categoryApi } from "@/service/categoryApi";
 export { default as artistApi } from "@/service/artistApi";
 export { default as cartApi } from "@/service/cartApi";
 export { default as userItemApi } from "@/service/userItemApi";
+export { default as billApi } from "@/service/billApi";
+export { default as incomeApi } from "@/service/incomeApi";

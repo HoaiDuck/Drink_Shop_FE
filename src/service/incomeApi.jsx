@@ -1,26 +1,26 @@
 import { instance } from "@/util";
 
-const categoryApi = {
+const incomeApi = {
   getAll() {
-    const url = "category";
+    const url = "user/Income";
     return instance.get(url);
   },
-  get(id) {
-    const url = `category?_id=${id}`;
+  get(_id) {
+    const url = `user/Income?_id=${_id}`;
     return instance.get(url);
   },
-  
+
   add(data) {
-    const url = "user/sale/category";
+    const url = "user/Income";
     return instance.post(url, data);
   },
   update(data) {
-    const url = `user/admin/category`;
+    const url = `user/Acc`;
     return instance.put(url, data);
   },
   delete(data) {
-    const url = "user/admin/category";
+    const url = "user/Acc";
     return instance.delete(url, data);
   },
 };
-export default categoryApi;
+export default incomeApi;

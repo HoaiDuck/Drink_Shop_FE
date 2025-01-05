@@ -22,7 +22,10 @@ const Workspace = () => {
         // Lấy thông tin chi tiết của từng item
         const itemsDetails = await Promise.all(
           userItems.map(async (userItem) => {
-            const itemResponse = await itemApi.getById(userItem.item);
+            const itemResponse = await itemApi.getById({
+              _id: userItem.item,
+              getArtistId: 0,
+            });
             console.log(">>>CHECK URL:", itemResponse.data.originlUrl);
             return {
               id: userItem._id,

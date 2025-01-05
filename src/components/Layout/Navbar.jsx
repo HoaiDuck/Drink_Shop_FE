@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import BtnAccount from "./Nav/BtnAccount";
 import BtnMenu from "./Nav/BtnMenu";
@@ -9,49 +9,31 @@ import { Logo } from "@/components/Logo";
 import { AuthContext } from "@/context/AuthContext";
 import { CheckRole } from "@/components/PrivateComponent";
 import { Button, Dropdown, Space } from "antd";
+import { itemApi } from "@/service";
+const Navbar = ({ cateData }) => {
+  const [items, setItems] = useState([]);
 
-const Navbar = (cateData) => {
-  const items = [
-    {
-      key: "1",
-      label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.antgroup.com"
-        >
-          1st menu item
-        </a>
-      ),
-    },
-    {
-      key: "2",
-      label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.aliyun.com"
-        >
-          2nd menu item
-        </a>
-      ),
-    },
-    {
-      key: "3",
-      label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.luohanacademy.com"
-        >
-          3rd menu item
-        </a>
-      ),
-    },
-  ];
+  useEffect(() => {
+    // Kiểm tra nếu cateData là một mảng
+    if (Array.isArray(cateData)) {
+      // Chuyển đổi cateData thành định dạng items
+      try {
+        const formattedItems = cateData.map((category, index) => ({
+          key: String(index + 1),
+          label: <Link to={`/category/${category._id}`}>{category.Name}</Link>,
+        }));
+        console.log(">>>>>>>>>>>>>CHECK category .map", formattedItems);
+        setItems(formattedItems);
+      } catch (error) {
+        console.error(">>>>>>>>>>>>>CHECK error", error);
+      }
+    }
+  }, [cateData]);
+
   const checkcontext = useContext(AuthContext);
 
   console.log(">>>>>>>>>>>>>CHECK CONTEXT AT HOME:", checkcontext);
+  console.log(">>>>>>>>>>>>>CHECK dataCateory:", items);
   return (
     <div>
       <nav className="flex items-center justify-between bg-gray-100 p-3 rounded-lg shadow-md sticky top-0 z-50">
@@ -59,34 +41,14 @@ const Navbar = (cateData) => {
           <Logo />
           <div className="flex items-center space-x-4 px-5">
             <BtnHome />
-            <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
-              Category
-              <span className="ml-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </span>
-            </button>
+
             <Dropdown
-              className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400"
-              menu={{
-                items,
-              }}
+              className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400 h-10"
+              menu={{ items }}
               placement="bottomRight"
               arrow
             >
-              <Button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
+              <Button className="ui-sans-serif flex flex-row px-4 py-2 bg-gray-300 rounded-full text-base font-medium hover:bg-gray-400 leading-6 ">
                 Category
                 <span className="ml-1">
                   <svg
@@ -106,7 +68,9 @@ const Navbar = (cateData) => {
                 </span>
               </Button>
             </Dropdown>
-            <BtnCreate />
+            <CheckRole action="manage" subject="Item">
+              <BtnCreate />
+            </CheckRole>
             {/* can author */}
             <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
               Aution
@@ -127,28 +91,29 @@ const Navbar = (cateData) => {
                 </svg>
               </span>
             </button>
-
-            <Link to="/Admin">
-              <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
-                Admin
-                <span className="ml-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                    />
-                  </svg>
-                </span>
-              </button>
-            </Link>
+            <CheckRole action="manage" subject="all">
+              <Link to="/Admin">
+                <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
+                  Admin
+                  <span className="ml-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </span>
+                </button>
+              </Link>
+            </CheckRole>
             <Link to="/Cart">
               <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
                 Cart
