@@ -9,6 +9,10 @@ const billApi = {
     const url = `user/Bill?_id=${_id}`;
     return instance.get(url);
   },
+  getByYear(year) {
+    const url = `user/Bill/year?year=${year}`;
+    return instance.get(url);
+  },
   add(data) {
     const url = `user/Bill`;
     return instance.post(url, data);

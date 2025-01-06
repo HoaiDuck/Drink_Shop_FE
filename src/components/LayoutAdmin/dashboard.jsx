@@ -39,30 +39,27 @@ const DashboardLayout = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   return (
-    <Layout
-      style={{
-        minHeight: "100vh",
-      }}
-    >
-      <Sidenav />
+    <Layout style={{ minHeight: "100vh" }}>
+      {/* Sidenav */}
+      <Layout.Sider
+        width={200}
+        className="fixed left-0 top-0 h-full  text-white"
+      >
+        <Sidenav />
+      </Layout.Sider>
 
-      <Layout>
+      {/* Main Layout */}
+      <Layout style={{ marginLeft: 200 }}>
         <Header
           style={{
-            padding: 0,
             background: colorBgContainer,
-          }}
-        />
-        <Content
-          style={{
-            margin: "0 16px",
+            padding: "0 16px",
           }}
         >
-          <Breadcrumb
-            style={{
-              margin: "16px 0",
-            }}
-          >
+          <h1 className="text-lg font-bold">Dashboard</h1>
+        </Header>
+        <Content style={{ margin: "16px" }}>
+          <Breadcrumb style={{ marginBottom: "16px" }}>
             <Breadcrumb.Item>User</Breadcrumb.Item>
             <Breadcrumb.Item>Bill</Breadcrumb.Item>
           </Breadcrumb>
@@ -71,6 +68,7 @@ const DashboardLayout = () => {
         <Footer
           style={{
             textAlign: "center",
+            background: colorBgContainer,
           }}
         >
           Ant Design ©{new Date().getFullYear()} Created by Ant UED
@@ -79,4 +77,5 @@ const DashboardLayout = () => {
     </Layout>
   );
 };
+
 export default DashboardLayout;
