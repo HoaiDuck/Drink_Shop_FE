@@ -2,6 +2,8 @@ import { Breadcrumb, Layout, Menu, theme } from "antd";
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import { accountApi } from "@/service";
+import { useNavigate } from "react-router-dom";
+
 const { Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
@@ -26,35 +28,38 @@ const items = [
     getItem("Bill", "4"),
     getItem("Alex", "5"),
   ]),
-  getItem("Team", "sub2", <TeamOutlined />, [
+  getItem("Roles", "sub2", <TeamOutlined />, [
     getItem("Team 1", "6"),
     getItem("Team 2", "8"),
   ]),
   getItem("Files", "9", <FileOutlined />),
 ];
 
-const handleMenuClick = async (e) => {
-  console.log("Clicked item key:", e.key);
-  const res = await accountApi.getAll();
-
-  // Xử lý logic theo từng key
-  switch (e.key) {
-    case "dashboard":
-      console.log("Test get all ACCOUNT:", res.data);
-      break;
-    case "account":
-      console.log("Navigate to Account");
-      break;
-    case "tom":
-      console.log("Tom's Request selected");
-      break;
-    default:
-      console.log(`Unhandled menu key: ${e.key}`);
-  }
-};
-
 const Sidenav = () => {
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const handleMenuClick = async (e) => {
+    console.log("Clicked item key:", e.key);
+    const res = await accountApi.getAll();
+
+    // Xử lý logic theo từng key
+    switch (e.key) {
+      case "dashboard":
+        console.log("Test get all ACCOUNT:", res.data);
+        navigate("/Admin");
+        break;
+      case "account":
+        console.log("Navigate to Account");
+        navigate("/Admin/Account");
+        break;
+      case "tom":
+        console.log("Tom's Request selected");
+        break;
+      default:
+        console.log(`Unhandled menu key: ${e.key}`);
+    }
+  };
+
   return (
     <Sider
       collapsible

@@ -24,6 +24,7 @@ const defineAbilitiesFor = (role) => {
         { action: "create", subject: "Request" },
         { action: "create", subject: "Category" },
         { action: "delete", subject: "Request" },
+        { action: "manage", subject: "Property" },
       ];
     case 3: // NormalUser
       return [

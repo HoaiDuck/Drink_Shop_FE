@@ -22,8 +22,8 @@ const accountApi = {
     return instance.put(url, data);
   },
   delete(data) {
-    const url = "user/Acc";
-    return instance.delete(url, data);
+    const url = `user/Acc?_id=${data._id}`; // Gửi _id qua query parameters
+    return instance.delete(url);
   },
 };
 export default accountApi;
