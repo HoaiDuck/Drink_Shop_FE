@@ -10,7 +10,8 @@ const billApi = {
     return instance.get(url);
   },
   getByYear(year) {
-    const url = `user/Bill/year?year=${year}`;
+    const url = `user/Bill/Year?year=${year}`;
+    console.log(">>>>CHECK Year at Service:", year);
     return instance.get(url);
   },
   add(data) {

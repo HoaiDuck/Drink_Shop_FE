@@ -34,6 +34,7 @@ const LoginForm = () => {
       localStorage.setItem("access_token", res.data.access_token);
       // localStorage.setItem("userInfor", res.data.user);
       const getStorageToken = localStorage.getItem("access_token");
+      console.log(">>>>CHECK USER At login:", res.data.user);
       setUser(res.data.user);
       await new Promise((resolve) => setTimeout(resolve, 0));
       console.log(">>>>CHEC SET Storage Token:", getStorageToken);

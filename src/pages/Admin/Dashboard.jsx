@@ -37,7 +37,7 @@ export function Dashboard() {
       // Fetch bill data for the selected year
       const billResponse = await billApi.getByYear(selectedYear);
       const bills = billResponse.data;
-      console.log(">>>>CHECK Revenue by year:", billResponse);
+      console.log(">>>>CHECK Revenue by year:", selectedYear);
       // Tính toán doanh thu theo tháng
       const revenueByMonth = {};
       bills.forEach((bill) => {
