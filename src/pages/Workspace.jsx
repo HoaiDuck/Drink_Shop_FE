@@ -3,6 +3,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { accountApi } from "@/service";
 import { AuthContext } from "@/context";
 import path from "path-browserify";
+
 const Workspace = () => {
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,9 +31,10 @@ const Workspace = () => {
             return {
               id: userItem._id,
               title: itemResponse.data.name,
-              imageUrl: `http://localhost:8070/images/${path.basename(
-                itemResponse.data.originlUrl
-              )}`,
+              // imageUrl: `http://localhost:8070/images/${path.basename(
+              //   itemResponse.data.originlUrl
+              // )}`,
+              imageUrl: itemResponse.data.originlUrl,
               description: itemResponse.data.description,
               date: new Date(userItem.createdAt).toLocaleDateString(),
             };

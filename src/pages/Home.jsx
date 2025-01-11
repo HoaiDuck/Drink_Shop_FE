@@ -18,8 +18,8 @@ const Home = () => {
 
         const loadedDimensions = images.map((image) => ({
           id: image._id, // Thêm id của item để sử dụng khi thêm vào giỏ hàng
-          url: `http://localhost:8070/images/${path.basename(image.url)}`,
-
+          // url: `http://localhost:8070/images/${path.basename(image.url)}`,
+          url: image.url,
           name: image.name,
           description: image.description,
           artist: image.artist,

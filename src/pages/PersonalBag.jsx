@@ -28,14 +28,18 @@ const PersonalBag = () => {
 
         const itemsDetails = await Promise.all(
           userItems.map(async (userItem) => {
-            const itemResponse = await itemApi.getById({ _id: userItem.item , getArtistId:0});
+            const itemResponse = await itemApi.getById({
+              _id: userItem.item,
+              getArtistId: 0,
+            });
             console.log(">>>CHECK URL:", itemResponse.data.originlUrl);
             return {
               id: userItem._id,
               title: itemResponse.data.name,
-              imageUrl: `http://localhost:8070/images/${path.basename(
-                itemResponse.data.originlUrl
-              )}`,
+              // imageUrl: `http://localhost:8070/images/${path.basename(
+              //   itemResponse.data.originlUrl
+              // )}`,
+              imageUrl: itemResponse.data.originlUrl,
               description: itemResponse.data.description,
               date: new Date(userItem.createdAt).toLocaleDateString(),
             };
