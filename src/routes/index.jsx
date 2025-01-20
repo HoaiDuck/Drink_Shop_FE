@@ -66,7 +66,7 @@ const router = createBrowserRouter([
         element: <UnAuthor />,
       },
       {
-        path: "itemDetails",
+        path: "itemDetails/:id",
         element: <ItemDetails />,
       },
       {
