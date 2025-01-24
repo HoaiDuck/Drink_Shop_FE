@@ -19,3 +19,4 @@ export { default as Workspace } from "@/pages/Workspace.jsx";
 export { default as PersonalBag } from "@/pages/PersonalBag";
 export { default as Property } from "@/pages/Property";
 export { default as CategoryPage } from "@/pages/Category";
+export { default as VisitedWorkspace } from "@/pages/VisitedWorkspace";

@@ -5,8 +5,8 @@ import { message } from "antd";
 import { AuthContext } from "@/context/AuthContext";
 import Swal from "sweetalert2";
 import { useNavigate, Link } from "react-router-dom";
-
-const Home = () => {
+import PropTypes from "prop-types";
+const VisitedHome = ({ id }) => {
   const [imageDimensions, setImageDimensions] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ const Home = () => {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await itemApi.getAll();
+        const response = await itemApi.getByArtistId(id);
         const images = response.data;
         const loadedDimensions = await Promise.all(
           images.map(async (image) => {
@@ -158,5 +158,8 @@ const Home = () => {
     </div>
   );
 };
+VisitedHome.propTypes = {
+  id: PropTypes.string.isRequired, // id là bắt buộc và phải là kiểu string
+};
 
-export default Home;
+export default VisitedHome;

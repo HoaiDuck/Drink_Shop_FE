@@ -9,6 +9,11 @@ const accountApi = {
     const url = `user/Acc`;
     return instance.get(url);
   },
+  getAccById(id) {
+    const url = `Artist?id=${id}`;
+    return instance.get(url);
+  },
+
   getByRole() {
     const url = `user/Account?_id=${2}`;
     return instance.get(url);

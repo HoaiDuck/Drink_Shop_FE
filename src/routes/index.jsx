@@ -23,6 +23,7 @@ import {
   PersonalBag,
   Property,
   CategoryPage,
+  VisitedWorkspace,
 } from "@/pages";
 import { PrivateRoute } from "@/components/Layout"; // Import ProtectedRoute
 import { DashboardLayout } from "@/components/LayoutAdmin";
@@ -68,6 +69,10 @@ const router = createBrowserRouter([
       {
         path: "itemDetails/:id",
         element: <ItemDetails />,
+      },
+      {
+        path: "Artist/:id",
+        element: <VisitedWorkspace />,
       },
       {
         path: "Cart",

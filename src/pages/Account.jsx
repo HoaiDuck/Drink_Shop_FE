@@ -17,9 +17,7 @@ const Account = () => {
         />
 
         <h1 className="text-2xl font-bold mt-4">{user.username}</h1>
-        <p className="text-sm text-gray-500">
-          Lv{user.level}: {user.bio}
-        </p>
+        <p className="text-sm text-gray-500">{user.bio}</p>
 
         <div className="flex gap-4 mt-6">
           <button className="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300">
