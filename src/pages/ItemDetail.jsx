@@ -4,6 +4,7 @@ import "antd/dist/reset.css";
 import { useParams } from "react-router-dom";
 import { itemApi } from "@/service";
 import { Link } from "react-router-dom";
+
 const ItemDetails = () => {
   const [itemDetail, setItemDetail] = useState(null); // Khởi tạo itemDetail là null
   const { id } = useParams();
@@ -52,38 +53,47 @@ const ItemDetails = () => {
                 <div className="my-2">
                   <h3 className="font-medium">Category:</h3>
                   <p className="text-sm text-gray-600">
-                    {/* {itemDetail.category.join(", ")} */}
-                    {itemDetail.category.map((category, index) => (
-                      <span key={index}>
-                        {category}
-                        {index < itemDetail.category.length - 1 ? ", " : ""}
-                      </span>
-                    ))}
+                    {/* Kiểm tra nếu category là mảng */}
+                    {Array.isArray(itemDetail.category) && itemDetail.category.length > 0 ? (
+                      itemDetail.category.map((category, index) => (
+                        <span key={index}>
+                          {category}
+                          {index < itemDetail.category.length - 1 ? ", " : ""}
+                        </span>
+                      ))
+                    ) : (
+                      <span>No categories available</span>
+                    )}
                   </p>
                 </div>
                 <div className="my-2">
                   <h3 className="font-medium">Artist:</h3>
                   <p className="text-sm text-gray-600">
-                    {itemDetail.artist.map((artist, index) => (
-                      <Link
-                        to={`/Artist/${itemDetail.artistId[index]}`}
-                        key={itemDetail.artistId[index]}
-                      >
-                        <span
-                          className="text-blue-500 hover:text-blue-700 hover:underline cursor-pointer"
-                          title="Click to see more"
+                    {/* Kiểm tra nếu artist và artistId là mảng */}
+                    {Array.isArray(itemDetail.artist) && itemDetail.artist.length > 0 ? (
+                      itemDetail.artist.map((artist, index) => (
+                        <Link
+                          to={`/Artist/${Array.isArray(itemDetail.artistId) && itemDetail.artistId[index] ? itemDetail.artistId[index] : ''}`}
+                          key={itemDetail.artistId[index] || index}
                         >
-                          {artist}
-                          {index < itemDetail.artist.length - 1 ? ", " : ""}
-                        </span>
-                      </Link>
-                    ))}
-                  </p>{" "}
+                          <span
+                            className="text-blue-500 hover:text-blue-700 hover:underline cursor-pointer"
+                            title="Click to see more"
+                          >
+                            {artist}
+                            {index < itemDetail.artist.length - 1 ? ", " : ""}
+                          </span>
+                        </Link>
+                      ))
+                    ) : (
+                      <span>No artists available</span>
+                    )}
+                  </p>
                 </div>
                 <div className="my-2">
                   <h3 className="font-medium">Description:</h3>
                   <p className="text-sm text-gray-600">
-                    {itemDetail.description}
+                    {itemDetail.description || "No description available"}
                   </p>
                 </div>
                 <Button

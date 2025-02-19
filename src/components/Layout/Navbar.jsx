@@ -14,14 +14,19 @@ const Navbar = ({ cateData }) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    // Kiểm tra nếu cateData là một mảng
     if (Array.isArray(cateData)) {
-      // Chuyển đổi cateData thành định dạng items
       try {
-        const formattedItems = cateData.map((category, index) => ({
+        // Sắp xếp cateData theo thứ tự bảng chữ cái dựa trên Name
+        const sortedCategories = [...cateData].sort((a, b) =>
+          a.Name.localeCompare(b.Name)
+        );
+  
+        // Chuyển đổi cateData thành định dạng items
+        const formattedItems = sortedCategories.map((category, index) => ({
           key: String(index + 1),
           label: <Link to={`/category/${category._id}`}>{category.Name}</Link>,
         }));
+  
         console.log(">>>>>>>>>>>>>CHECK category .map", formattedItems);
         setItems(formattedItems);
       } catch (error) {
@@ -29,6 +34,7 @@ const Navbar = ({ cateData }) => {
       }
     }
   }, [cateData]);
+  
 
   const checkcontext = useContext(AuthContext);
 
