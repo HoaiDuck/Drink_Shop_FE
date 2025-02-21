@@ -8,7 +8,6 @@ import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import Footer from "@/components/Layout/Footer";
 
 const Home = () => {
   const [imageDimensions, setImageDimensions] = useState([]);
@@ -17,8 +16,6 @@ const Home = () => {
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
-  const imagesPerPage = 1;
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -59,20 +56,6 @@ const Home = () => {
     fetchImages();
   }, []);
 
-  const totalPages = Math.ceil(imageDimensions.length / imagesPerPage);
-  const getPagination = () => {
-    if (totalPages <= 4) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-    if (currentPage <= 2) {
-      return [1, 2, 3, 4, "..."];
-    }
-    if (currentPage >= totalPages - 1) {
-      return ["...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-    }
-    return ["...", currentPage - 1, currentPage, currentPage + 1, "..."];
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
       <div className="w-full h-[300px] bg-gray-200 flex items-center justify-center mb-4">
@@ -112,6 +95,7 @@ const Home = () => {
           </Swiper>
         )}
       </div>
+
       <p className="text-center text-gray-700 font-semibold mt-4">Wedesign - Art</p>
       <div className="px-10">
         {loading ? (
@@ -119,52 +103,35 @@ const Home = () => {
         ) : error ? (
           <p className="text-center text-red-500">{error}</p>
         ) : (
-          <>
-            <Masonry
-              breakpointCols={{ default: 4, 1100: 3, 700: 2, 500: 1 }}
-              className="flex -ml-2"
-              columnClassName="pl-2"
-            >
-              {imageDimensions.slice((currentPage - 1) * imagesPerPage, currentPage * imagesPerPage).map((image, index) => (
+          <Masonry
+            breakpointCols={{ default: 4, 1100: 3, 700: 2, 500: 1 }}
+            className="flex -ml-2"
+            columnClassName="pl-2"
+          >
+            {imageDimensions.map((image, index) => (
+              <div
+                key={index}
+                className="mb-2 relative overflow-hidden rounded-lg group cursor-pointer"
+                onMouseEnter={() => setHoveredId(image.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                onClick={() => navigate(`/itemDetails/${image.id}`)}
+              >
                 <div
-                  key={index}
-                  className="mb-2 relative overflow-hidden rounded-lg group cursor-pointer"
-                  onMouseEnter={() => setHoveredId(image.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  onClick={() => navigate(`/itemDetails/${image.id}`)}
+                  className="relative w-full h-0"
+                  style={{ paddingBottom: `${(image.height / image.width) * 100}%` }}
                 >
-                  <div
-                    className="relative w-full h-0"
-                    style={{ paddingBottom: `${(image.height / image.width) * 100}%` }}
-                  >
-                    <img
-                      src={image.originlUrl}
-                      alt={`Image ${index}`}
-                      className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300"
-                      loading="lazy"
-                    />
-                  </div>
+                  <img
+                    src={image.originlUrl}
+                    alt={`Image ${index}`}
+                    className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300"
+                    loading="lazy"
+                  />
                 </div>
-              ))}
-            </Masonry>
-            <div className="flex justify-center mt-4 space-x-2">
-              <button className="px-4 py-2 bg-gray-200 rounded" onClick={() => setCurrentPage(1)}>&laquo;</button>
-              {getPagination().map((page, index) => (
-                <button
-                  key={index}
-                  className={`px-4 py-2 rounded ${currentPage === page ? 'bg-gray-800 text-white' : 'bg-gray-200'}`}
-                  onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                  disabled={typeof page !== 'number'}
-                >
-                  {page}
-                </button>
-              ))}
-              <button className="px-4 py-2 bg-gray-200 rounded" onClick={() => setCurrentPage(totalPages)}>&raquo;</button>
-            </div>
-          </>
+              </div>
+            ))}
+          </Masonry>
         )}
       </div>
-      <Footer />
     </div>
   );
 };
