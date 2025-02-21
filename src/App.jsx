@@ -13,6 +13,7 @@ const App = () => {
   useEffect(() => {
     const initApp = async () => {
       const accessToken = localStorage.getItem("access_token");
+      console.log(">>>CHECK ACCTOKEN At APP:", accessToken);
       if (accessToken) {
         await fetchUserInfor();
       }

@@ -32,6 +32,7 @@ export const AuthProvider = (props) => {
   const fetchUserInfor = async () => {
     try {
       const res = await accountApi.get();
+      console.log(">>>CHECK ACCTOKEN At Authcontext:", res);
       if (res?.data?.data && Array.isArray(res?.data?.role)) {
         const dataUser = {
           _id: res.data.data._id,

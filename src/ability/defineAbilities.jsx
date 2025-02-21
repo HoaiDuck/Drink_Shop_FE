@@ -17,6 +17,10 @@ const defineAbilitiesFor = (role) => {
         { action: "manage", subject: "Request" },
         { action: "manage", subject: "Dashboard" },
         { action: "manage", subject: "all" },
+        { action: "purchase", subject: "Item" },
+        { action: "create", subject: "Request" },
+        { action: "delete", subject: "Request" },
+        { action: "update", subject: "Account" },
       ];
     case 2: // Artist
       return [
@@ -25,6 +29,10 @@ const defineAbilitiesFor = (role) => {
         { action: "create", subject: "Category" },
         { action: "delete", subject: "Request" },
         { action: "manage", subject: "Property" },
+        { action: "purchase", subject: "Item" },
+        { action: "create", subject: "Request" },
+        { action: "delete", subject: "Request" },
+        { action: "update", subject: "Account" },
       ];
     case 3: // NormalUser
       return [
