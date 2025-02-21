@@ -20,3 +20,6 @@ export { default as PersonalBag } from "@/pages/PersonalBag";
 export { default as Property } from "@/pages/Property";
 export { default as CategoryPage } from "@/pages/Category";
 export { default as VisitedWorkspace } from "@/pages/VisitedWorkspace";
+export { default as RequestManage } from "@/pages/Request";
+export { default as ManageRequest } from "@/pages/RequestChildPages/ManageRequest";
+export { default as SettingTerm } from "@/pages/RequestChildPages/SettingTerm";

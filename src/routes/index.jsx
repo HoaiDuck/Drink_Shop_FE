@@ -24,6 +24,9 @@ import {
   Property,
   CategoryPage,
   VisitedWorkspace,
+  RequestManage,
+  SettingTerm,
+  ManageRequest,
 } from "@/pages";
 import { PrivateRoute } from "@/components/Layout"; // Import ProtectedRoute
 import { DashboardLayout } from "@/components/LayoutAdmin";
@@ -81,6 +84,14 @@ const router = createBrowserRouter([
       {
         path: "Bill",
         element: <Bill />,
+      },
+      {
+        path: "Request",
+        element: <RequestManage />,
+        children: [
+          { index: true, element: <ManageRequest /> },
+          { path: "SettingTerm", element: <SettingTerm /> },
+        ],
       },
     ],
   },

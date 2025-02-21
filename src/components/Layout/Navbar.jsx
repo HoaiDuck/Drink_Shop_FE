@@ -8,8 +8,46 @@ import { Link } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { AuthContext } from "@/context/AuthContext";
 import { CheckRole } from "@/components/PrivateComponent";
-import { Button, Dropdown, Space } from "antd";
+import { Button, Dropdown } from "antd";
 import { itemApi } from "@/service";
+import {
+  AppstoreOutlined,
+  MailOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+
+const itemsMenu = [
+  {
+    key: "sub1",
+    label: "Navigation Two",
+    icon: <AppstoreOutlined />,
+    children: [
+      {
+        key: "5",
+        label: "Option 5",
+      },
+      {
+        key: "6",
+        label: "Option 6",
+      },
+      {
+        key: "sub3",
+        label: "Submenu",
+        children: [
+          {
+            key: "7",
+            label: "Option 7",
+          },
+          {
+            key: "8",
+            label: "Option 8",
+          },
+        ],
+      },
+    ],
+  },
+];
+
 const Navbar = ({ cateData }) => {
   const [items, setItems] = useState([]);
 
@@ -82,7 +120,7 @@ const Navbar = ({ cateData }) => {
             {/* can author */}
             <CheckRole action="purchase" subject="Item">
               <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
-                Aution
+                Auction
                 <span className="ml-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -124,29 +162,7 @@ const Navbar = ({ cateData }) => {
                 </button>
               </Link>
             </CheckRole>
-            <CheckRole action="manage" subject="Property">
-              <Link to="/Property">
-                <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
-                  Property
-                  <span className="ml-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="size-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                      />
-                    </svg>
-                  </span>
-                </button>
-              </Link>
-            </CheckRole>
+
             <CheckRole action="purchase" subject="Item">
               <Link to="/Cart">
                 <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
@@ -170,27 +186,6 @@ const Navbar = ({ cateData }) => {
                 </button>
               </Link>
             </CheckRole>
-            <Link to="/Login">
-              <button className="flex flex-row px-4 py-2 bg-gray-300 rounded-full font-medium hover:bg-gray-400">
-                Login
-                <span className="ml-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                    />
-                  </svg>
-                </span>
-              </button>
-            </Link>
           </div>
         </div>
         <div className="flex items-center space-x-4">
@@ -238,10 +233,8 @@ const Navbar = ({ cateData }) => {
               <span className="sr-only">Tạo mới</span>
             </button>
             {/* can author */}
-
-            <BtnAccount />
-            <BtnMenu />
           </CheckRole>
+          <BtnMenu />
         </div>
       </nav>
     </div>

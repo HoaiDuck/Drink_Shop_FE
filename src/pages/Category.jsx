@@ -5,6 +5,7 @@ import { message } from "antd";
 import { AuthContext } from "@/context/AuthContext";
 import Masonry from "react-masonry-css";
 import path from "path-browserify";
+import { Empty } from "antd";
 const CategoryPage = () => {
   const [imageDimensions, setImageDimensions] = useState([]);
   const { categoryId } = useParams();
@@ -35,6 +36,7 @@ const CategoryPage = () => {
         }));
         setImageDimensions(loadedDimensions);
         setItems(itemsResponse.data);
+        setError(null);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Không thể tải ảnh. Vui lòng thử lại sau.");
@@ -45,6 +47,7 @@ const CategoryPage = () => {
 
     fetchData();
   }, [categoryId]);
+  useEffect(() => {}, [error]);
   if (!category) return <div>Loading...</div>;
   const masonryBreakpoints = {
     default: 4,
@@ -78,46 +81,50 @@ const CategoryPage = () => {
       <h2 className="text-xl font-semibold mt-4">
         Items ({category.TotalItem}):
       </h2>
-      <div className="relative w-screen h-screen flex flex-col bg-gray-100">
-        <div className="p-4">
-          {loading ? (
-            <p className="text-center text-gray-500">Loading...</p>
-          ) : error ? (
-            <p className="text-center text-red-500">{error}</p>
-          ) : (
-            <Masonry
-              breakpointCols={masonryBreakpoints}
-              className="flex -ml-4 w-auto"
-              columnClassName="pl-4 bg-clip-padding"
-            >
-              {imageDimensions.map((image, index) => (
-                <div
-                  key={index}
-                  className="mb-4 bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => handleAddToCart(image)} // Thêm sự kiện onClick
-                >
-                  <img
-                    src={image.url}
-                    alt={`Image ${index}`}
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                  <div className="mt-2">
-                    <h3 className="text-lg font-semibold">{image.name}</h3>
-                    <p className="text-gray-600">{image.description}</p>
-                    <p className="text-gray-600">
-                      Artist: {image.artist.join(", ")}
-                    </p>
-                    <p className="text-gray-600">
-                      Category: {image.category.join(", ")}
-                    </p>
-                    <p className="text-gray-600">Price: ${image.price}</p>
+      {error ? (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      ) : (
+        <div className="relative w-screen h-screen flex flex-col bg-gray-100">
+          <div className="p-4">
+            {loading ? (
+              <p className="text-center text-gray-500">Loading...</p>
+            ) : error ? (
+              <p className="text-center text-red-500">{error}</p>
+            ) : (
+              <Masonry
+                breakpointCols={masonryBreakpoints}
+                className="flex -ml-4 w-auto"
+                columnClassName="pl-4 bg-clip-padding"
+              >
+                {imageDimensions.map((image, index) => (
+                  <div
+                    key={index}
+                    className="mb-4 bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => handleAddToCart(image)} // Thêm sự kiện onClick
+                  >
+                    <img
+                      src={image.url}
+                      alt={`Image ${index}`}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                    <div className="mt-2">
+                      <h3 className="text-lg font-semibold">{image.name}</h3>
+                      <p className="text-gray-600">{image.description}</p>
+                      <p className="text-gray-600">
+                        Artist: {image.artist.join(", ")}
+                      </p>
+                      <p className="text-gray-600">
+                        Category: {image.category.join(", ")}
+                      </p>
+                      <p className="text-gray-600">Price: ${image.price}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </Masonry>
-          )}
+                ))}
+              </Masonry>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

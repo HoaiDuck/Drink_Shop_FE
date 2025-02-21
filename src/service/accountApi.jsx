@@ -9,8 +9,8 @@ const accountApi = {
     const url = `user/Acc`;
     return instance.get(url);
   },
-  getAccById(id) {
-    const url = `Artist?id=${id}`;
+  getAccById(_id) {
+    const url = `Artist?_id=${_id}`;
     return instance.get(url);
   },
 
