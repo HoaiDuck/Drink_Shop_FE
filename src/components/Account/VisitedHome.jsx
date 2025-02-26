@@ -6,6 +6,8 @@ import { AuthContext } from "@/context/AuthContext";
 import Swal from "sweetalert2";
 import { useNavigate, Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { Empty } from "antd";
+
 const VisitedHome = ({ id }) => {
   const [imageDimensions, setImageDimensions] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
@@ -106,7 +108,9 @@ const VisitedHome = ({ id }) => {
         {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
         ) : error ? (
-          <p className="text-center text-red-500">{error}</p>
+          <p className="text-center text-red-500">
+            {<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+          </p>
         ) : (
           <Masonry
             breakpointCols={masonryBreakpoints}

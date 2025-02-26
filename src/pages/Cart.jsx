@@ -125,20 +125,17 @@ const Cart = () => {
         bio: user.bio,
       });
 
-      await billApi.add({
-        cartId: user.cart,
-        paymentMethod: "None",
-        status: "Paid",
-        totalAmount: totalAmount,
-      });
       // Gọi API userItem.add() cho từng sản phẩm được chọn
+      let listItem = [];
       await Promise.all(
         selectedItems.map(async (item) => {
+          listItem.push(item._id);
           const addUserItem = await userItemApi.add({
             userId: user._id,
             item: item._id,
             type: 0,
           });
+
           await cartApi.update({
             _id: user.cart,
             item: item._id,
@@ -165,7 +162,14 @@ const Cart = () => {
           console.log(">>>CHECK ADD user Item:", addUserItem);
         })
       );
-
+      console.log(">>CHECK ListItem", listItem);
+      await billApi.add({
+        cartId: user.cart,
+        paymentMethod: "None",
+        status: "Paid",
+        totalAmount: totalAmount,
+        Item: listItem,
+      });
       // Đóng Modal
       setIsModalVisible(false);
 

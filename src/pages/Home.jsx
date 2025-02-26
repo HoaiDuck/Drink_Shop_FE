@@ -58,12 +58,14 @@ const Home = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      hello
       <div className="w-full h-[300px] bg-gray-200 flex items-center justify-center mb-4">
         <p className="text-gray-500">Chèn ảnh tường ở đây</p>
       </div>
-
       <div className="w-[85%] mx-auto py-4">
-        <h2 className="text-xl font-semibold text-gray-700 text-center mb-4">Có thể bạn sẽ thích</h2>
+        <h2 className="text-xl font-semibold text-gray-700 text-center mb-4">
+          Có thể bạn sẽ thích
+        </h2>
         {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
         ) : error ? (
@@ -95,8 +97,9 @@ const Home = () => {
           </Swiper>
         )}
       </div>
-
-      <p className="text-center text-gray-700 font-semibold mt-4">Wedesign - Art</p>
+      <p className="text-center text-gray-700 font-semibold mt-4">
+        Wedesign - Art
+      </p>
       <div className="px-10">
         {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
@@ -118,7 +121,9 @@ const Home = () => {
               >
                 <div
                   className="relative w-full h-0"
-                  style={{ paddingBottom: `${(image.height / image.width) * 100}%` }}
+                  style={{
+                    paddingBottom: `${(image.height / image.width) * 100}%`,
+                  }}
                 >
                   <img
                     src={image.originlUrl}

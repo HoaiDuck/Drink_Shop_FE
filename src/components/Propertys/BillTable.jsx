@@ -8,7 +8,6 @@ const columns = [
     title: "ID",
     dataIndex: "_id",
   },
-
   {
     title: "Status",
     dataIndex: "status",
@@ -16,6 +15,17 @@ const columns = [
   {
     title: "Total Amount",
     dataIndex: "totalAmount",
+    render: (totalAmount) => {
+      // Kiểm tra nếu totalAmount là một đối tượng và có $numberDecimal
+      if (
+        totalAmount &&
+        typeof totalAmount === "object" &&
+        totalAmount.$numberDecimal
+      ) {
+        return totalAmount.$numberDecimal; // Hiển thị giá trị $numberDecimal
+      }
+      return totalAmount; // Trường hợp khác, hiển thị trực tiếp
+    },
   },
   {
     title: "Created At",
@@ -38,6 +48,7 @@ const BillTable = () => {
     setLoading(true);
     try {
       const response = await billApi.get(userId); // Gọi API để lấy dữ liệu hóa đơn
+      console.log(">>>>CHECK Display BILL:", response);
       setData(response.data); // Cập nhật state với dữ liệu từ API
     } catch (error) {
       console.error("Failed to fetch bills:", error);

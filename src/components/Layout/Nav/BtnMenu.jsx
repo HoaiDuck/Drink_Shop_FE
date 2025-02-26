@@ -60,7 +60,7 @@ const BtnMenu = () => {
   const handleMenuClick = (e) => {
     switch (e.key) {
       case "0":
-        navigate("/");
+        navigate(`/Artist/${user._id}`);
         break;
       case "1":
         navigate("/Account/Workspace");
