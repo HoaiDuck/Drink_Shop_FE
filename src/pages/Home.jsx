@@ -58,7 +58,6 @@ const Home = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      hello
       <div className="w-full h-[300px] bg-gray-200 flex items-center justify-center mb-4">
         <p className="text-gray-500">Chèn ảnh tường ở đây</p>
       </div>
