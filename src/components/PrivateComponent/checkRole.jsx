@@ -1,31 +1,20 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Navigate } from "react-router-dom";
-import { useAbility } from "@casl/react";
-
+import React, { useContext } from "react";
 import { AuthContext } from "@/context/AuthContext";
-import { ability, defineAbilitiesFor } from "@/ability";
-const CheckRole = ({ action, subject, children }) => {
-  const { user, setUser } = useContext(AuthContext);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    console.log(">>>CHECK context User:", user);
-    const roleNumber = Number(user.userRole); // Đảm bảo role là number
-    const permissions = defineAbilitiesFor(roleNumber);
-    ability.update(permissions); // Cập nhật Ability
-    setLoading(false);
-    console.log("Updated abilities:", ability);
-  }, [user]);
+import { UnAuthor } from "@/pages";
+import { Loading } from "@/components";
 
-  console.log("Ability:", ability); // Kiểm tra xem ability có giá trị hay không
-  if (!ability.can(action, subject)) {
-    return <></>;
-  }
-  if (loading) {
-    return null; //nếu ability chưa xong, sẽ ép chạy lại
-  }
-  console.log("Current user role:", user.userRole);
-  console.log("Permissions after update:", ability.rules);
+const CheckRole = ({ role, children }) => {
+  const { user, appLoading } = useContext(AuthContext);
 
-  return children;
+  if (appLoading) {
+    return <Loading />;
+  }
+  console.log(">>>CHECK USER at checkrole:", user);
+  if (!user || !user.role) {
+    return <UnAuthor />;
+  }
+
+  return user.role === role ? children : <UnAuthor />;
 };
+
 export default CheckRole;

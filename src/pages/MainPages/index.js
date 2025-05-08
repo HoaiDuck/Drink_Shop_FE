@@ -1,0 +1,17 @@
+export { default as Home } from "@/pages/MainPages/Home";
+export { default as Menu } from "@/pages/MainPages/Menu";
+export { default as News } from "@/pages/MainPages/News";
+export { default as Address } from "@/pages/MainPages/Address.jsx";
+export { default as DetailFood } from "@/pages/MainPages/DetailFood";
+export { default as BlogMain } from "@/pages/MainPages/BlogMain";
+export { default as DetailBlog } from "@/pages/MainPages/DetailBlog";
+export { default as PaymentPage } from "@/pages/MainPages/PaymentPage";
+export { default as OrderSuccess } from "@/pages/MainPages/OrderSuccess";
+export { default as OrderFail } from "@/pages/MainPages/OrderFail";
+export { default as Login } from "@/pages/MainPages/Login";
+export { default as ForgotPassword } from "@/pages/MainPages/ModalForgotPassword";
+export { default as AuthenticationCode } from "@/pages/MainPages/AuthenticationCode";
+export { default as ResetPassword } from "@/pages/MainPages/ResetPassword";
+export { default as CustomerProfile } from "@/pages/MainPages/CustomerProfile";
+export { default as UnAuthor } from "@/pages/MainPages/UnAuthorized";
+export { default as ErrorBoundary } from "@/pages/MainPages/ErrorBoundary";

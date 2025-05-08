@@ -1,60 +1,49 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { PropTypes } from "prop-types";
-import { ability } from "@/ability";
-import { accountApi } from "@/service";
+
+import { AuthApi } from "@/service";
 
 export const AuthContext = createContext({
-  _id: "",
-  email: "",
-  cart: "",
+  id: "",
+  name: "",
+  birthday: "",
   username: "",
-  userRole: "",
-  coin: "",
-  level: "",
-  bio: "",
+  phoneNumber: "",
+  gender: "",
+  role: "",
 });
 
 export const AuthProvider = (props) => {
   const [user, setUser] = useState({
-    _id: 0,
-    email: "",
+    id: "",
+    name: "",
+    birthday: "",
     username: "",
-    cart: "",
-    userRole: [],
-    coin: 0,
-    level: 0,
-    bio: " ",
+    phoneNumber: "",
+    gender: "",
+    role: "",
   });
-  // const [appLoading, isAppLoading] = useState(false);
+  const [appLoading, setAppLoading] = useState(true);
 
-  // const login = (userData) => setUser(userData);
-  // const logout = () => setUser(null);
   const fetchUserInfor = async () => {
     try {
-      const res = await accountApi.get();
+      const res = await AuthApi.authMe();
       console.log(">>>CHECK ACCTOKEN At Authcontext:", res);
-      if (res?.data?.data && Array.isArray(res?.data?.role)) {
-        const dataUser = {
-          _id: res.data.data._id,
-          email: res.data.data.email,
-          cart: res.data.data.cart,
-          username: res.data.data.username,
-          userRole: Number(res.data.role[0]), // Chuyển đổi role sang number
-          coin: res.data.data.coin,
-          level: res.data.data.level,
-          bio: res.data.data.bio,
-        };
-        setUser(dataUser); // Cập nhật trạng thái user
-        console.log(">>>>>CHECK API DATA:", dataUser);
-      } else {
-        console.error("Invalid user data:", res?.data);
-      }
+      console.log("==> AuthMe res:", res.data.result);
+      setUser(res.data.result);
+      setAppLoading(false);
     } catch (error) {
       console.error("Error fetching user info:", error);
+      setAppLoading(true);
+    } finally {
+      setAppLoading(false);
     }
   };
+  useEffect(() => {
+    fetchUserInfor();
+  }, []);
   return (
-    <AuthContext.Provider value={{ user, setUser, fetchUserInfor }}>
+    <AuthContext.Provider value={{ user, setUser, fetchUserInfor, appLoading }}>
       {props.children}
     </AuthContext.Provider>
   );

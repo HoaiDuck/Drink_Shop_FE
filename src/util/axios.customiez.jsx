@@ -1,42 +1,68 @@
 import axios from "axios";
-
-// Set config defaults when creating the instance
+import { AuthApi } from "@/service";
+// Khởi tạo Axios instance
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BE_URL,
-  //baseURL: localhost/80708070
+  withCredentials: true, // gửi cookie chứa refresh_token
 });
-//Why set import.meta.env.BE_URL and API will return something really strange?
-// Alter defaults after instance has been created
-instance.defaults.headers.common["Authorization"] = import.meta.env.VITE_BE_URL;
-// Add a request interceptor
+
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+function onRefreshed(newAccessToken) {
+  refreshSubscribers.forEach((callback) => callback(newAccessToken));
+  refreshSubscribers = [];
+}
+
+function addRefreshSubscriber(callback) {
+  refreshSubscribers.push(callback);
+}
+
+// Interceptor cho request - đính kèm access_token
 instance.interceptors.request.use(
-  function (config) {
-    if (
-      typeof window !== "undefined" &&
-      window &&
-      window.localStorage &&
-      window.localStorage.getItem("access_token")
-    ) {
-      config.headers.Authorization =
-        "Bearer " + window.localStorage.getItem("access_token");
+  (config) => {
+    const accessToken = localStorage.getItem("access_token");
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
-  function (error) {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Add a response interceptor
+// Interceptor cho response - xử lý khi access_token hết hạn
 instance.interceptors.response.use(
-  function (response) {
-    // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
-    return response;
-  },
-  function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Nếu access_token hết hạn và chưa retry
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          const res = await AuthApi.refreshToken();
+          const newAccessToken = res.data.access_token;
+          localStorage.setItem("access_token", newAccessToken);
+          isRefreshing = false;
+          onRefreshed(newAccessToken);
+        } catch (refreshError) {
+          isRefreshing = false;
+          return Promise.reject(refreshError);
+        }
+      }
+
+      // Hàng đợi các request cần retry
+      return new Promise((resolve) => {
+        addRefreshSubscriber((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          resolve(instance(originalRequest)); // retry request
+        });
+      });
+    }
+
     return Promise.reject(error);
   }
 );

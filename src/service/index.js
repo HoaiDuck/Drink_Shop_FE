@@ -1,10 +1,5 @@
-export { default as accountApi } from "@/service/accountApi";
-export { default as itemApi } from "@/service/ItemApi";
-export { default as requestApi } from "@/service/requestApi";
-export { default as loginApi } from "@/service/loginApi";
-export { default as categoryApi } from "@/service/categoryApi";
-export { default as artistApi } from "@/service/artistApi";
-export { default as cartApi } from "@/service/cartApi";
-export { default as userItemApi } from "@/service/userItemApi";
-export { default as billApi } from "@/service/billApi";
-export { default as incomeApi } from "@/service/incomeApi";
+export { default as AuthApi } from "@/service/AuthAPI";
+export { default as uploadImageToCloudinary } from "@/service/CloudImageAPI";
+export { default as cloudinary } from "@/service/cloudinary";
+export { default as ProductAPI } from "@/service/ProductAPI";
+export { default as OrderAPI } from "@/service/OrderAPI";

@@ -95,7 +95,7 @@ export const chartConfigs = {
 export const statisticsChartsData = [
   {
     color: "white",
-    title: "Website Views",
+    title: "Sản phẩm bán chạy",
     description: "Last Campaign Performance",
     footer: "campaign sent 2 days ago",
     chart: {
@@ -115,7 +115,7 @@ export const statisticsChartsData = [
   },
   {
     color: "white",
-    title: "Completed Tasks",
+    title: "Số lượng truy cập",
     description: "Last Campaign Performance",
     footer: "just updated",
     chart: {
