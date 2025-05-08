@@ -108,7 +108,8 @@ const UpdateProduct = ({
     if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
       setLoading(true);
       try {
-        await ProductAPI.deleteProduct(product.id);
+        console.log("Check id:", product.id);
+        await ProductAPI.deleteProductById(product.id);
         onUpdateProduct(null); // Truyền null để xác định đã xóa
         setShowModal(false);
       } catch (error) {

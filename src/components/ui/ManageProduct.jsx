@@ -101,9 +101,12 @@ const ManageProduct = () => {
   };
 
   // Lọc sản phẩm theo tên (phía client)
-  const filteredProducts = products.filter((product) => {
-    return product.name?.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const filteredProducts = products.filter(
+    (product) =>
+      product &&
+      typeof product.name === "string" &&
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleEditProduct = (product) => {
     setSelectedProduct(product);
@@ -171,9 +174,11 @@ const ManageProduct = () => {
             product={selectedProduct}
             onUpdateProduct={(updatedProduct) => {
               setProducts((prevProducts) =>
-                prevProducts.map((p) =>
-                  p._id === updatedProduct._id ? updatedProduct : p
-                )
+                prevProducts
+                  .filter((p) => p && p._id)
+                  .map((p) =>
+                    p._id === updatedProduct._id ? updatedProduct : p
+                  )
               );
               setShowUpdateModal(false);
             }}

@@ -14,7 +14,7 @@ const ProductAPI = {
     return instance.put(url, data);
   },
   deleteProductById(id) {
-    const url = "products/{id}";
+    const url = `products/${id}`;
     return instance.delete(url, id);
   },
   getProductById(id) {
