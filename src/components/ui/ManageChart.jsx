@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StatisticsChart } from "@/components";
 import { statisticsChartsData } from "@/data";
-import { OrderAPI } from "@/service";
+import { OrderAPI, ProductAPI } from "@/service";
 
 const ManageChart = () => {
   const [chartsData, setChartsData] = useState(statisticsChartsData);
@@ -15,11 +15,31 @@ const ManageChart = () => {
         return;
       }
 
-      const data = { startDate, endDate };
-      const response = await OrderAPI.makeRevenue(data);
-      const orders = response.data.result;
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const now = new Date();
 
-      // Xử lý dữ liệu doanh thu theo ngày
+      if (end < start) {
+        alert("Ngày kết thúc không được nhỏ hơn ngày bắt đầu");
+        return;
+      }
+
+      if (start > now || end > now) {
+        alert("Không được chọn ngày trong tương lai");
+        return;
+      }
+
+      const data = { startDate, endDate };
+
+      const [responseRevenue, responseTopSelling] = await Promise.all([
+        OrderAPI.makeRevenue(data),
+        ProductAPI.getTopSellingProduct(data),
+      ]);
+
+      const orders = responseRevenue.data.result;
+      const topSelling = responseTopSelling.data.result;
+
+      // === 1. Doanh thu theo ngày ===
       const revenueByDate = orders.reduce((acc, order) => {
         const date = new Date(order.createAt).toISOString().split("T")[0];
         acc[date] = (acc[date] || 0) + Number(order.totalPrice);
@@ -29,45 +49,63 @@ const ManageChart = () => {
       const sortedDates = Object.keys(revenueByDate).sort();
       const dailyRevenue = sortedDates.map((date) => revenueByDate[date]);
 
-      // Cập nhật chỉ chart Revenue
+      // === 2. Dữ liệu sản phẩm bán chạy ===
+      const topProductNames = topSelling.map((p) => p.name);
+      const topProductQuantities = topSelling.map((p) => p.quantity);
+
+      // === 3. Cập nhật cả hai chart: revenue + sản phẩm bán chạy ===
       setChartsData((prevChartsData) =>
         prevChartsData.map((chart) => {
-          if (chart.title.toLowerCase().includes("revenue")) {
+          const title = chart.title.toLowerCase();
+
+          if (title.includes("revenue")) {
             return {
               ...chart,
               title: "Doanh thu theo ngày",
               description: `Từ ${startDate} đến ${endDate}`,
               chart: {
                 ...chart.chart,
-                series: [
-                  {
-                    name: "Doanh thu",
-                    data: dailyRevenue,
-                  },
-                ],
+                series: [{ name: "Doanh thu", data: dailyRevenue }],
                 options: {
                   ...chart.chart.options,
                   xaxis: {
                     ...chart.chart.options.xaxis,
                     categories: sortedDates,
                     labels: {
-                      formatter: function (value) {
-                        return new Date(value).toLocaleDateString("vi-VN");
-                      },
+                      formatter: (value) =>
+                        new Date(value).toLocaleDateString("vi-VN"),
                     },
                   },
                 },
               },
             };
           }
+
+          if (title.includes("sản phẩm")) {
+            return {
+              ...chart,
+              title: "Sản phẩm bán chạy",
+              description: `Từ ${startDate} đến ${endDate}`,
+              chart: {
+                ...chart.chart,
+                series: [{ name: "Số lượng bán", data: topProductQuantities }],
+                options: {
+                  ...chart.chart.options,
+                  xaxis: {
+                    categories: topProductNames,
+                  },
+                },
+              },
+            };
+          }
+
           return chart;
         })
       );
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu doanh thu:", error);
+      console.error("Lỗi khi lấy dữ liệu cho thống kê:", error);
     }
   };
-
   useEffect(() => {
     console.log("Dữ liệu chart hiện tại:", chartsData);
   }, [chartsData]);

@@ -1,137 +1,112 @@
 import { useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import axios from "axios";
+import { uploadImageToCloudinary, BannerAPI } from "@/service";
 
-const AddBlog = ({ onClose, onBlogAdded }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+const AddBlog = ({ onClose, onBannerAdded }) => {
   const [image, setImage] = useState(null);
-  const [displayHot, setDisplayHot] = useState(1);
-  const [error, setError] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [error, setError] = useState("");
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
-      setPreviewImage(URL.createObjectURL(file)); // Set preview image URL
+      setPreviewImage(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    if (!title || !content || !image || !displayHot) {
-      setError("Yêu cầu nhập đầy đủ tất cả.");
+    if (!image || !startDate || !endDate) {
+      setError("Vui lòng nhập đầy đủ các trường bắt buộc.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    formData.append("image", image);
-    formData.append("displayHot", displayHot);
-
     try {
-      const response = await axios.post(
-        "https://bamoscoffeehh.up.railway.app/api/blogs",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
-      );
-      onBlogAdded(response.data.data); // Cập nhật danh sách blog sau khi thêm thành công
-      onClose();
-    } catch (error) {
-      setError("Failed to add blog. Please try again.");
+      console.log("Check before cloudinary!");
+      // Upload ảnh lên Cloudinary
+      const imageUrl = await uploadImageToCloudinary(image);
+      console.log("Check after cloudinary!");
+      // Gửi dữ liệu banner lên API
+      const response = await BannerAPI.create({
+        url: imageUrl,
+        startDate,
+        endDate,
+      });
+      console.log("Check after call API!");
+      onBannerAdded(response.result); // Gọi callback cập nhật danh sách
+      onClose(); // Đóng modal sau khi thêm
+    } catch (err) {
+      setError("Thêm banner thất bại. Vui lòng thử lại.");
     }
   };
 
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="w-full max-w-7xl rounded-lg bg-white p-6 shadow-lg">
-        <h2 className="mb-4 text-center text-4xl font-bold">Tạo bài viết</h2>
+      <div className="w-full max-w-4xl rounded-lg bg-white p-6 shadow-lg">
+        <h2 className="mb-4 text-center text-4xl font-bold">Thêm Banner</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Phần Tiêu đề và Ảnh */}
-            <div>
-              <div className="mb-4 mt-1">
-                <label className="mb-2 block text-xl font-medium text-gray-700">
-                  Tiêu đề
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 p-2"
-                  required
-                />
-              </div>
-              <div className="w-1/2">
-                <label className="block pb-2 text-xl font-medium">
-                  Đặt làm Hot
-                </label>
-                <select
-                  value={displayHot}
-                  onChange={(e) => setDisplayHot(+e.target.value)}
-                  className="h-12 w-1/2 rounded-md border border-gray-300 p-2"
-                >
-                  <option value={1}>Hot</option>
-                  <option value={2}>Không Hot</option>
-                </select>
-              </div>
-              <div className="mb-4 flex flex-col">
-                <label className="mb-2 block pt-4 text-xl font-medium text-black">
-                  Ảnh bài viết
-                </label>
-                <span className="text-base">
-                  + Kích thước phù hợp cho Banner là{" "}
-                  <span className="font-bold text-red-900">1920px * 576px</span>
-                </span>
-                <span className="my-1 mb-2 text-base">
-                  + Kích thước phù hợp cho Hot là{" "}
-                  <span className="font-bold text-red-900">1280px * 544px</span>
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="w-full"
-                  required
-                />
-                {previewImage && (
-                  <img
-                    src={previewImage}
-                    alt="Preview"
-                    className="mt-4 h-48 w-auto max-w-full object-contain"
-                  />
-                )}
-              </div>
-            </div>
-            {/* Phần Content (Quill) */}
+            {/* Ảnh banner */}
             <div>
               <label className="mb-2 block text-xl font-medium text-gray-700">
-                Nội dung
+                Ảnh banner
               </label>
-              <ReactQuill
-                value={content}
-                onChange={setContent}
-                style={{
-                  height: "300px",
-                  resize: "both",
-                  overflow: "hidden",
-                  maxWidth: "100%",
-                  maxHeight: "480px",
-                }}
-                className="w-full rounded-md border border-gray-300"
+              <span className="text-base">
+                + Kích thước phù hợp:{" "}
+                <span className="font-bold text-red-900">1920px * 576px</span>
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="mt-2 w-full"
+                required
+              />
+              {previewImage && (
+                <img
+                  src={previewImage}
+                  alt="Preview"
+                  className="mt-4 h-48 w-auto max-w-full object-contain"
+                />
+              )}
+            </div>
+
+            {/* Ngày bắt đầu & kết thúc */}
+            <div>
+              <label className="block text-xl font-medium text-gray-700">
+                Ngày bắt đầu hiển thị
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="mt-2 w-full rounded border p-2 shadow-sm"
+                required
+              />
+
+              <label className="mt-6 block text-xl font-medium text-gray-700">
+                Ngày kết thúc hiển thị
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="mt-2 w-full rounded border p-2 shadow-sm"
                 required
               />
             </div>
           </div>
+
           {error && (
-            <p className="mb-4 flex justify-center text-red-500">{error}</p>
+            <p className="mb-4 text-center text-red-500 font-semibold">
+              {error}
+            </p>
           )}
+
           <div className="flex justify-center space-x-40">
             <button
               type="button"
@@ -144,7 +119,7 @@ const AddBlog = ({ onClose, onBlogAdded }) => {
               type="submit"
               className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
-              Tạo bài viết
+              Thêm Banner
             </button>
           </div>
         </form>

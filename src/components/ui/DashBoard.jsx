@@ -183,7 +183,7 @@ const DashBoard = () => {
           />
           <SidebarItem
             icon={faFileWord}
-            label="Bài viết"
+            label="Banner"
             isSidebarExpanded={isSidebarExpanded}
             onClick={() => handleSetActiveComponent("Blog")}
             isActive={activeComponent === "Blog"}
