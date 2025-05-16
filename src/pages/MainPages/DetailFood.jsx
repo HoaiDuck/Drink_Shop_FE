@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBasketShopping } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
+import { ProductAPI } from "@/service";
+import { CartAPI } from "@/service";
 import { toast } from "react-toastify";
 import { Loading, Review, RelatedProduct } from "@/components";
 const DetailFood = () => {
   const [quantity, setQuantity] = useState(1);
-  const [categories, setCategories] = useState([]);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
@@ -16,45 +16,31 @@ const DetailFood = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        setLoading(true); // Bật trạng thái loading trước khi gọi API
-        const response = await axios.get(
-          `https://bamoscoffeehh.up.railway.app/api/mainPages/${id}`
-        );
-        if (response.data.success) {
-          const product = response.data.data;
-          setProduct(product); // Lưu sản phẩm vào state
+        setLoading(true);
+        const response = await ProductAPI.getProductById(id);
+        if (response.data.code == 200) {
+          const data = response.data.result;
+          const mappedProduct = {
+            id: data.id,
+            name: data.name,
+            imageUrl: data.imageUrl,
+            price: data.price,
+            description: data.description,
+            quantity: data.quantity,
+          };
+          setProduct(mappedProduct);
         } else {
           console.error("Sản phẩm không tồn tại hoặc API lỗi.");
         }
       } catch (error) {
         console.error("Lỗi khi gọi API:", error);
       } finally {
-        setLoading(false); // Tắt trạng thái loading sau khi xử lý xong
+        setLoading(false);
       }
     };
 
     fetchProduct();
   }, [id, navigate]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(
-          "https://bamoscoffeehh.up.railway.app/api/mainPages/activeCategories"
-        );
-        if (response.data.success) {
-          setCategories(response.data.data);
-        } else {
-          console.error("Lỗi khi lấy danh mục.");
-        }
-      } catch (error) {
-        console.error("Lỗi khi gọi API danh mục:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
   if (loading) {
     return (
       <div className="flex h-[255px] w-full items-center justify-center lg:h-[550px]">
@@ -75,13 +61,6 @@ const DetailFood = () => {
       </button>
     );
   }
-
-  const activeCategory = product.category.name; // Đảm bảo sản phẩm có thuộc tính category
-
-  const handleCategoryClick = (categoryName) => {
-    navigate(`/menu?category=${categoryName}`);
-  };
-
   const handleQuantityChange = (e) => {
     const value = e.target.value;
     if (value === "") {
@@ -100,34 +79,21 @@ const DetailFood = () => {
     }
   };
 
-  const handleAddToCart = () => {
-    // Lấy giỏ hàng hiện tại từ localStorage
-    const tempCart = JSON.parse(localStorage.getItem("tempCart")) || [];
-
-    // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
-    const existingItemIndex = tempCart.findIndex(
-      (item) => item.productId === product._id
-    );
-
-    if (existingItemIndex > -1) {
-      // Nếu đã tồn tại, tăng số lượng
-      tempCart[existingItemIndex].quantity += quantity;
-    } else {
-      // Nếu chưa, thêm sản phẩm mới
-      tempCart.push({
-        productId: product._id,
-        name: product.name,
-        img: product.image,
-        price: product.sell_price,
-        quantity,
-      });
+  const handleAddToCart = async () => {
+    try {
+      const data = {
+        productId: product.id,
+        quantity: quantity,
+      };
+      const response = await CartAPI.addCartItem(data);
+      if (response.data.code == 200) {
+        toast.success("Thêm vào giỏ hàng thành công");
+      } else {
+        toast.success("Thêm vào giỏ hàng thất bại");
+      }
+    } catch (error) {
+      toast.error("Thêm vào giỏ hàng bị lỗi");
     }
-
-    // Lưu lại giỏ hàng vào localStorage
-    localStorage.setItem("tempCart", JSON.stringify(tempCart));
-
-    // Hiển thị thông báo (tuỳ chọn)
-    toast.success("Thêm vào giỏ hàng thành công");
   };
 
   return (
@@ -136,7 +102,7 @@ const DetailFood = () => {
         {/* Left Section */}
         <div className="w-full scale-90 cursor-pointer overflow-hidden rounded-lg md:w-[300px]">
           <img
-            src={product.image}
+            src={product.imageUrl}
             alt={product.name}
             className="h-full w-full object-cover"
           />
@@ -150,13 +116,8 @@ const DetailFood = () => {
             </h1>
             <p>
               <span className="font-josefin text-[30px] font-bold text-[#663402]">
-                {product.sell_price.toLocaleString()}đ
+                {product.price.toLocaleString()}đ
               </span>
-              {product.price !== product.sell_price && (
-                <span className="price-old ml-2 text-2xl font-bold text-[#999] line-through">
-                  {product.price.toLocaleString()} đ
-                </span>
-              )}
             </p>
             <div className="mb-4 mt-2 h-[1px] w-full bg-gray-300 lg:mb-2 lg:mt-0"></div>
             <span className="font-josefin-sans text-lg font-semibold">
@@ -197,31 +158,16 @@ const DetailFood = () => {
           <h3 className="text-center font-josefin text-3xl font-bold text-[#663402] md:text-start">
             Danh mục thực đơn
           </h3>
-          <ul className="m-0 list-none p-0 pt-4 text-center md:text-start">
-            {categories.map((category) => (
-              <li
-                key={category._id}
-                onClick={() => handleCategoryClick(category.name)}
-                className={`cursor-pointer border-b border-gray-200 px-4 py-2 font-josefin text-lg transition-colors duration-300 ${
-                  category.name === activeCategory
-                    ? "bg-[#169cbe] font-bold text-white"
-                    : "hover:bg-[#169cbe] hover:font-bold hover:text-white"
-                }`}
-              >
-                {category.name}
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
 
       {/* Review Section */}
       <div className="mt-8">
-        <Review productId={product._id} />
+        <Review productId={product.id} />
       </div>
 
       <div>
-        <RelatedProduct productId={product._id} />
+        <RelatedProduct productId={product.id} />
       </div>
     </div>
   );

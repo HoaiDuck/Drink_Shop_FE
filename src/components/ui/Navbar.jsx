@@ -9,8 +9,8 @@ import {
   SidebarCart,
   NavbarLink,
 } from "@/components/common";
-
-const Navbar = () => {
+import { AuthContext } from "@/context";
+const Navbar = ({ user }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartVisible, setCartVisible] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -59,18 +59,20 @@ const Navbar = () => {
       <div className="flex items-center space-x-4">
         <SearchItem />
         <UserDropdown />
-        <a
-          href="#cart"
-          className="relative cursor-pointer text-2xl text-[#333] transition-all duration-300 hover:text-[#d88453]"
-          onClick={handleCartClick}
-        >
-          <FontAwesomeIcon icon={faShoppingCart} />
-          {totalItems > 0 && (
-            <div className="absolute right-[-6px] top-[-6px] flex h-[17px] w-[17px] items-center justify-center rounded-full bg-[#ed4321] text-xs text-white">
-              {totalItems}
-            </div>
-          )}
-        </a>
+        {user?.username && (
+          <a
+            href="#cart"
+            className="relative cursor-pointer text-2xl text-[#333] transition-all duration-300 hover:text-[#d88453]"
+            onClick={handleCartClick}
+          >
+            <FontAwesomeIcon icon={faShoppingCart} />
+            {totalItems > 0 && (
+              <div className="absolute right-[-6px] top-[-6px] flex h-[17px] w-[17px] items-center justify-center rounded-full bg-[#ed4321] text-xs text-white">
+                {totalItems}
+              </div>
+            )}
+          </a>
+        )}
       </div>
       <div className="item flex">
         <div className="flex items-end pl-3 text-[27px] sm:hidden">

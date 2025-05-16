@@ -11,15 +11,15 @@ const BannerAPI = {
   },
   addBanner(data) {
     const url = "banners";
-    return instance.get(url, data);
+    return instance.post(url, data);
   },
   setStatus(data) {
     const url = "banners";
     return instance.put(url, data);
   },
   deleteBannerByID(id) {
-    const url = "banners/{id}";
-    return instance.put(url, id);
+    const url = `banners/${id}`;
+    return instance.delete(url, id);
   },
 };
 export default BannerAPI;

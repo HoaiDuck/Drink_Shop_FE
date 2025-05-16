@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ModalProduct } from "@/components"; // Import ModalProduct component
-import axios from "axios";
-import { Loading } from "@/components";
+import { ModalProduct, Loading } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSliders } from "@fortawesome/free-solid-svg-icons";
-
+import { ProductAPI, CartAPI } from "@/service";
+import { toast } from "react-toastify";
 const Menu = () => {
-  const [activeCategory, setActiveCategory] = useState("TẤT CẢ");
-  const [categories, setCategories] = useState(["TẤT CẢ"]); // Lưu danh sách danh mục
-  const [products, setProducts] = useState([]); // Lưu danh sách sản phẩm
+  const [activeCategory, setActiveCategory] = useState("DRINK");
+  const categories = ["DRINK", "FOOD"];
+  const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(10); // Số sản phẩm trên mỗi trang
+  const productsPerPage = 10;
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
@@ -21,33 +20,19 @@ const Menu = () => {
   const [selectedCategory, setSelectedCategory] = useState("Menu");
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(
-          "https://bamoscoffeehh.up.railway.app/api/mainPages/activeCategories"
-        );
-        const categoryData = response.data.data.map(
-          (category) => category.name
-        );
-        setCategories(["TẤT CẢ", ...categoryData]);
-      } catch (error) {
-        console.error("Error fetching categories:", error.message);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(
-          "https://bamoscoffeehh.up.railway.app/api/mainPages/activeProducts"
-        );
-        setProducts(response.data.data);
+        const response = await ProductAPI.getAllProducts();
+        console.log("CHECK menu:", response.data.result);
+        if (response.data.code == 200) {
+          setProducts(response.data.result || []);
+        } else {
+          setProducts([]);
+        }
       } catch (error) {
-        console.error("Error fetching products:", error.message);
+        console.error("Error fetching products:", error);
+        setProducts([]);
       } finally {
         setIsLoading(false);
       }
@@ -58,8 +43,14 @@ const Menu = () => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
+    console.log(
+      "CHECK TYPE:",
+      products.map((p) => p.type)
+    );
     const category = queryParams.get("category");
-    if (category) setActiveCategory(category);
+    if (category && categories.includes(category)) {
+      setActiveCategory(category);
+    }
   }, [location.search]);
 
   const handleCategorySelect = (category) => {
@@ -71,42 +62,53 @@ const Menu = () => {
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
     navigate(`/menu?category=${category}`);
-    setCurrentPage(1); // Reset về trang đầu tiên khi đổi danh mục
+    setCurrentPage(1);
   };
 
-  const handleAddToCart = (product) => {
-    setSelectedProduct(product);
+  const handleAddToCart = async (product) => {
+    try {
+      const data = {
+        productId: product.id,
+        quantity: 1,
+      };
+      const response = await CartAPI.addCartItem(data);
+      if (response.data.code == 200) {
+        toast.success("Thêm vào giỏ hàng thành công");
+      } else {
+        toast.success("Thêm vào giỏ hàng thất bại");
+      }
+    } catch (error) {
+      toast.error("Thêm vào giỏ hàng bị lỗi");
+    }
   };
-
   const handleCloseModal = () => {
     setSelectedProduct(null);
     setQuantity(1);
   };
 
+  // Lọc sản phẩm theo type ("FOOD" hoặc "DRINK")
+  const filteredProducts = products.filter(
+    (item) => item.type === activeCategory
+  );
+
+  // Phân trang
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts =
-    activeCategory === "TẤT CẢ"
-      ? products
-          .filter((item) => item.category?.isActive === 1)
-          .slice(indexOfFirstProduct, indexOfLastProduct)
-      : products
-          .filter((item) => item.category.name === activeCategory)
-          .slice(indexOfFirstProduct, indexOfLastProduct);
-
-  const totalPages = Math.ceil(
-    (activeCategory === "TẤT CẢ"
-      ? products.filter((item) => item.category?.isActive === 1)
-      : products.filter((item) => item.category.name === activeCategory)
-    ).length / productsPerPage
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
   );
+
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   return (
     <div className="p-2 text-center lg:p-5">
       <h1 className="mb-4 text-4xl font-bold">
         Thực đơn Bamos<span className="text-[#C63402]">Coffee</span>
       </h1>
+
       <div className="relative mb-5">
+        {/* Menu cho mobile */}
         <div className="flex items-center justify-center px-4 pt-2 md:hidden">
           <button
             onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -135,6 +137,7 @@ const Menu = () => {
           </div>
         )}
 
+        {/* Menu cho desktop */}
         <div className="hidden justify-center font-bold md:flex">
           {categories.map((category) => (
             <button
@@ -151,78 +154,83 @@ const Menu = () => {
           ))}
         </div>
       </div>
+
       {isLoading ? (
         <div className="flex h-[300px] items-center justify-center">
           <Loading />
         </div>
       ) : (
-        <div className="mx-auto flex max-w-7xl flex-wrap justify-start">
-          <div className="flex flex-wrap gap-0">
-            {currentProducts.map((item) => (
-              <div
-                className="group relative mt-8 flex h-[340px] w-[185px] flex-col justify-between border-l border-r border-gray-300 bg-white p-3 text-center transition-shadow ease-linear lg:h-[340px] lg:w-[250px]"
-                key={item._id}
-              >
-                <div>
-                  <Link to={`/detailfood/${item._id}`}>
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="mx-auto h-[216px] transition-transform ease-linear group-hover:scale-[1.18]"
-                    />
-                  </Link>
-                </div>
-
-                <div className="mb-12 mt-4">
-                  <h6 className="text-sm font-bold text-[#333]">
-                    <Link
-                      to={`/detailfood/${item._id}`}
-                      className="line-clamp-1 font-josefin text-xl font-bold text-[#00561e]"
-                    >
-                      {item.name.substring(0, 20)}
-                      {item.name.length > 20 && "..."}
+        <>
+          {filteredProducts.length === 0 ? (
+            <div className="py-10 text-center text-lg text-gray-500">
+              Không có sản phẩm nào trong danh mục này.
+            </div>
+          ) : (
+            <div className="mx-auto flex max-w-7xl flex-wrap justify-start gap-4">
+              {currentProducts.map((item) => (
+                <div
+                  className="group relative flex h-[340px] w-[185px] flex-col justify-between border border-gray-300 bg-white p-3 text-center transition-shadow ease-linear hover:shadow-lg lg:h-[340px] lg:w-[250px]"
+                  key={item.id}
+                >
+                  <div>
+                    <Link to={`/detailfood/${item.id}`}>
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="mx-auto h-[216px] object-cover transition-transform ease-linear group-hover:scale-[1.18]"
+                        onError={(e) => (e.target.src = "/fallback-image.png")}
+                      />
                     </Link>
-                  </h6>
+                  </div>
 
-                  <div className="mb-2 font-josefin text-lg font-bold text-[#925802]">
-                    <span>{item.sell_price.toLocaleString()}đ</span>
-                    {item.price !== item.sell_price && (
-                      <span className="ml-2 text-base text-gray-500 line-through">
-                        {item.price.toLocaleString()}đ
-                      </span>
-                    )}
+                  <div className="mb-12 mt-4">
+                    <h6 className="text-sm font-bold text-[#333]">
+                      <Link
+                        to={`/detailfood/${item.id}`}
+                        className="line-clamp-1 font-josefin text-xl font-bold text-[#00561e]"
+                      >
+                        {item.name.length > 20
+                          ? item.name.substring(0, 20) + "..."
+                          : item.name}
+                      </Link>
+                    </h6>
+
+                    <div className="mb-2 font-josefin text-lg font-bold text-[#925802]">
+                      <span>{item.price.toLocaleString("vi-VN")}đ</span>
+                    </div>
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 w-full opacity-0 transition-opacity ease-linear group-hover:opacity-100">
+                    <button
+                      className="w-full bg-[#d88453] py-3 text-sm font-medium text-white transition-colors ease-linear hover:bg-[#633c02]"
+                      onClick={() => handleAddToCart(item)}
+                    >
+                      Thêm vào giỏ hàng
+                    </button>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
 
-                <div className="absolute bottom-0 left-0 w-full opacity-0 transition-opacity ease-linear group-hover:opacity-100">
-                  <button
-                    className="w-full bg-[#d88453] py-3 text-sm font-medium text-white transition-colors ease-linear hover:bg-[#633c02]"
-                    onClick={() => handleAddToCart(item)}
-                  >
-                    Thêm vào giỏ hàng
-                  </button>
-                </div>
-              </div>
+          {/* Phân trang */}
+          <div className="mt-4 flex justify-center">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`mx-1 px-3 py-1 font-bold ${
+                  currentPage === index + 1
+                    ? "bg-[#633c02] text-white"
+                    : "bg-white text-gray-800 hover:bg-[#d88453]"
+                } border border-gray-300`}
+              >
+                {index + 1}
+              </button>
             ))}
           </div>
-        </div>
+        </>
       )}
-
-      <div className="mt-4 flex justify-center">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentPage(index + 1)}
-            className={`mx-1 px-3 py-1 font-bold ${
-              currentPage === index + 1
-                ? "bg-[#633c02] text-white"
-                : "bg-white text-gray-800 hover:bg-[#d88453]"
-            } border border-gray-300`}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
 
       {selectedProduct && (
         <ModalProduct

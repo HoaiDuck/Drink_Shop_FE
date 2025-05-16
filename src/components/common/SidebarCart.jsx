@@ -3,100 +3,91 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
+import { CartAPI, ProductAPI } from "@/service";
 
 const SidebarCart = ({ handleCartClick }) => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
+  // Gọi API để lấy danh sách giỏ hàng
   useEffect(() => {
-    const tempCart = JSON.parse(localStorage.getItem("tempCart")) || [];
-    setCartItems(tempCart);
+    const fetchCart = async () => {
+      try {
+        const response = await CartAPI.getAllCartItems();
+        const cartData = response.data?.result.items;
+
+        // Gọi thêm thông tin từng sản phẩm
+        console.log("Check cart response:", response.data?.result.items);
+        const productDetails = await Promise.all(
+          cartData.map(async (item) => {
+            const res = await ProductAPI.getProductById(item.productId);
+            const product = res.data?.result;
+            return {
+              productId: item.productId,
+              name: product.name,
+              img: product.imageUrl,
+              price: product.price,
+              quantity: item.quantity, // current quantity
+              originalQuantity: item.quantity, // quantity from server
+            };
+          })
+        );
+
+        setCartItems(productDetails);
+      } catch (error) {
+        console.error("Lỗi khi lấy giỏ hàng:", error);
+      }
+    };
+
+    fetchCart();
   }, []);
 
-  // Cập nhật tổng giá trị giỏ hàng khi cartItems thay đổi
   useEffect(() => {
     const total = cartItems.reduce(
-      (total, item) => total + (item.quantity || 0) * item.price,
+      (total, item) => total + item.quantity * item.price,
       0
     );
     setTotalPrice(total);
   }, [cartItems]);
 
   const removeItem = (id) => {
-    // Xóa sản phẩm khỏi giỏ hàng tạm thời
     const updatedCart = cartItems.filter((item) => item.productId !== id);
     setCartItems(updatedCart);
-    localStorage.setItem("tempCart", JSON.stringify(updatedCart));
+    // TODO: Gọi CartAPI để xóa khỏi server
+  };
 
-    // Cập nhật lại tổng giá trị
-    const total = updatedCart.reduce(
-      (total, item) => total + item.quantity * item.price,
-      0
+  const updateQuantity = (productId, quantity) => {
+    const updatedCart = cartItems.map((item) =>
+      item.productId === productId ? { ...item, quantity } : item
     );
-    setTotalPrice(total);
+    setCartItems(updatedCart);
+    // TODO: Gọi CartAPI để cập nhật quantity
   };
 
   const decreaseQuantity = (productId) => {
-    setCartItems((prevCartItems) => {
-      const updatedCart = prevCartItems.map((item) =>
-        item.productId === productId && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      );
-      // Lưu lại vào localStorage
-      localStorage.setItem("tempCart", JSON.stringify(updatedCart));
-      return updatedCart;
-    });
+    const item = cartItems.find((i) => i.productId === productId);
+    if (item.quantity > 1) updateQuantity(productId, item.quantity - 1);
   };
 
   const increaseQuantity = (productId) => {
-    setCartItems((prevCartItems) => {
-      const updatedCart = prevCartItems.map((item) =>
-        item.productId === productId
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      );
-      // Lưu lại vào localStorage
-      localStorage.setItem("tempCart", JSON.stringify(updatedCart));
-      return updatedCart;
-    });
+    const item = cartItems.find((i) => i.productId === productId);
+    updateQuantity(productId, item.quantity + 1);
   };
 
   const handleQuantityChange = (e, productId) => {
-    const value = e.target.value;
-    const numericValue = parseInt(value, 10);
-
-    setCartItems((prevCartItems) => {
-      const updatedCart = prevCartItems.map((item) => {
-        if (item.productId === productId) {
-          if (!value) {
-            // Khi người dùng xóa hết, giữ trống tạm thời
-            return { ...item, quantity: "" };
-          } else if (!isNaN(numericValue) && numericValue >= 1) {
-            // Khi nhập số hợp lệ
-            return { ...item, quantity: numericValue };
-          }
-        }
-        return item;
-      });
-
-      // Lưu lại vào localStorage
-      localStorage.setItem("tempCart", JSON.stringify(updatedCart));
-      return updatedCart;
-    });
+    const newQuantity = parseInt(e.target.value || "1");
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.productId === productId ? { ...item, quantity: newQuantity } : item
+      )
+    );
   };
 
   const handleBlur = (productId) => {
-    setCartItems((prevCartItems) => {
-      const updatedCart = prevCartItems.map((item) =>
-        item.productId === productId && item.quantity === ""
-          ? { ...item, quantity: 1 }
-          : item
-      );
-      // Lưu lại vào localStorage
-      localStorage.setItem("tempCart", JSON.stringify(updatedCart));
-      return updatedCart;
-    });
+    const item = cartItems.find((i) => i.productId === productId);
+    if (!item.quantity || item.quantity < 1) {
+      updateQuantity(productId, 1);
+    }
   };
 
   const handlePaymentClick = () => {
@@ -105,35 +96,57 @@ const SidebarCart = ({ handleCartClick }) => {
         <strong>Hãy đăng nhập</strong> để có thể xem lại lịch sử đơn hàng
       </div>,
       {
-        autoClose: 2000, // Close after 5 seconds
-        hideProgressBar: false, // Show progress bar
-        closeOnClick: true, // Close when clicked
-        pauseOnHover: true, // Pause when hovering
-        draggable: true, // Allow dragging
-        className: "custom-toast", // Custom class for styling
+        autoClose: 2000,
         style: {
-          color: "black", // Custom text color
-          fontSize: "20px", // Custom font size
-          fontFamily: "Josefin Sans", // Custom font family
-          padding: "12px 20px", // Padding to make the toast look nicer
+          color: "black",
+          fontSize: "20px",
+          fontFamily: "Josefin Sans",
+          padding: "12px 20px",
           borderRadius: "8px",
         },
       }
     );
   };
+  const handleCartClose = async () => {
+    const changedItems = cartItems.filter(
+      (item) => item.quantity !== item.originalQuantity
+    );
 
+    try {
+      await Promise.all(
+        changedItems.map((item) => {
+          if (item.quantity > item.originalQuantity) {
+            CartAPI.addCartItem({
+              productId: item.productId,
+              quantity: item.quantity - item.originalQuantity,
+            });
+          } else if (item.quantity < item.originalQuantity) {
+            CartAPI.updateItemQuantity({
+              productId: item.productId,
+              quantity: item.originalQuantity - item.quantity,
+            });
+          }
+        })
+      );
+      console.log("Cập nhật thành công các thay đổi giỏ hàng");
+    } catch (err) {
+      console.error("Lỗi cập nhật giỏ hàng:", err);
+    }
+  };
   return (
     <div className="fixed right-0 top-0 z-[1000] flex h-full w-[370px] flex-col overflow-y-auto bg-white p-3 shadow-lg transition-transform ease-in-out">
       <button
-        className="absolute right-5 top-2 cursor-pointer border-none bg-transparent text-3xl text-[#909090] hover:text-black"
-        onClick={handleCartClick}
+        className="absolute right-5 top-2 text-3xl text-[#909090] hover:text-black"
+        onClick={async () => {
+          await handleCartClose();
+          handleCartClick();
+        }}
       >
         <FontAwesomeIcon icon={faTimes} />
       </button>
       <div className="mb-2 text-center text-2xl font-bold text-[#633c02]">
         Giỏ hàng
       </div>
-
       <div className="mb-5 border-b-2 border-[#ccc]" />
 
       <div className="flex-grow overflow-y-auto">
@@ -141,7 +154,7 @@ const SidebarCart = ({ handleCartClick }) => {
           cartItems.map((item) => (
             <div
               key={item.productId}
-              className="relative mb-4 flex ml-1 h-[120px] w-[328px] items-start rounded-lg border border-[#ddd] p-2"
+              className="relative mb-4 flex h-[120px] w-[328px] items-start rounded-lg border p-2"
             >
               <img
                 src={item.img}
@@ -180,7 +193,7 @@ const SidebarCart = ({ handleCartClick }) => {
                 </div>
               </div>
               <button
-                className="absolute right-3 top-2 cursor-pointer border-none bg-transparent text-xl text-red-300 hover:text-red-500"
+                className="absolute right-3 top-2 text-xl text-red-300 hover:text-red-500"
                 onClick={() => removeItem(item.productId)}
               >
                 <FontAwesomeIcon icon={faTrash} />
@@ -193,15 +206,17 @@ const SidebarCart = ({ handleCartClick }) => {
           </p>
         )}
       </div>
+
       <div className="mt-2 flex justify-between font-bold">
-        <span className="text-2xl font-josefin font-bold mt-2">Tổng cộng:</span>
-        <span className="text-2xl font-josefin font-bold mt-2 mr-2">
+        <span className="text-2xl font-josefin mt-2">Tổng cộng:</span>
+        <span className="text-2xl font-josefin mt-2 mr-2">
           {totalPrice.toLocaleString()}đ
         </span>
       </div>
+
       <Link to="/payment" state={{ cartItems, totalPrice }}>
         <button
-          className="mt-3 w-full cursor-pointer border-none bg-black p-2 text-white transition-transform duration-200 hover:scale-95"
+          className="mt-3 w-full bg-black p-2 text-white hover:scale-95"
           onClick={() => {
             handleCartClick();
             handlePaymentClick();
