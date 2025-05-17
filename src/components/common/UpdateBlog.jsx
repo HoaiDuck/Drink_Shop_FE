@@ -42,7 +42,7 @@ const UpdateBlog = ({ blog, onClose, onBlogUpdated }) => {
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        },
+        }
       );
       onBlogUpdated(response.data.data);
       onClose();
@@ -90,21 +90,6 @@ const UpdateBlog = ({ blog, onClose, onBlogUpdated }) => {
                   required
                 />
               </div>
-              <div className="w-1/2">
-                <label className="block pb-2 text-xl font-medium">
-                  Đặt làm Hot
-                </label>
-                <select
-                  value={displayHot}
-                  onChange={(e) => setDisplayHot(e.target.value)}
-                  className="h-12 w-1/2 rounded-md border border-gray-300 p-2"
-                  required
-                >
-                  <option value={1}>Hot</option>
-                  <option value={2}>Không Hot</option>
-                </select>
-              </div>
-
               {/* Ảnh hiển thị bên dưới ô chọn tệp */}
               <div className="mb-4 mt-1">
                 <label className="mb-2 block text-xl font-medium text-gray-700">
@@ -119,26 +104,6 @@ const UpdateBlog = ({ blog, onClose, onBlogUpdated }) => {
 
               {/* Hiển thị ảnh đã chọn hoặc ảnh cũ */}
               <div className="mb-4 mt-2">{displayImage}</div>
-            </div>
-
-            {/* Nội dung */}
-            <div>
-              <label className="mb-2 block text-xl font-medium text-gray-700">
-                Nội dung
-              </label>
-              <ReactQuill
-                value={content}
-                onChange={setContent}
-                style={{
-                  height: "300px",
-                  resize: "both",
-                  overflow: "hidden",
-                  maxWidth: "100%",
-                  maxHeight: "480px",
-                }}
-                className="w-full rounded-md border border-gray-300"
-                required
-              />
             </div>
           </div>
 

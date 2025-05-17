@@ -17,6 +17,10 @@ const ProductAPI = {
     const url = `products/${id}`;
     return instance.delete(url, id);
   },
+  getTopSellingProduct(data) {
+    const url = "products/topSelling";
+    return instance.post(url, data);
+  },
   getProductById(id) {
     const url = "products/{id}";
     return instance.get(url, id);
