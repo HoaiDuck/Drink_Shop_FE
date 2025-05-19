@@ -4,7 +4,8 @@ import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
 import ModalProduct from "./ModalProduct";
-import { ProductAPI } from "@/service";
+import { ProductAPI, CartAPI } from "@/service";
+import { toast } from "react-toastify";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -60,8 +61,21 @@ const ProductSlider = () => {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = (product) => {
-    setSelectedProduct(product);
+  const handleAddToCart = async (product) => {
+    try {
+      const data = {
+        productId: product.id,
+        quantity: quantity,
+      };
+      const response = await CartAPI.addCartItem(data);
+      if (response.data.code == 200) {
+        toast.success("Thêm vào giỏ hàng thành công");
+      } else {
+        toast.success("Thêm vào giỏ hàng thất bại");
+      }
+    } catch (error) {
+      toast.error("Thêm vào giỏ hàng bị lỗi");
+    }
   };
 
   const handleCloseModal = () => {
@@ -143,7 +157,7 @@ const ProductSlider = () => {
 
                   <div className="product-price">
                     <span className="font-josefin text-base font-bold text-[#9d6817]">
-                      {product.price} đ
+                      {product.price.toLocaleString("vi-VN")} đ
                     </span>
                   </div>
                 </div>
