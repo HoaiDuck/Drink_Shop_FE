@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBasketShopping } from "@fortawesome/free-solid-svg-icons";
@@ -6,11 +6,13 @@ import { ProductAPI } from "@/service";
 import { CartAPI } from "@/service";
 import { toast } from "react-toastify";
 import { Loading, Review, RelatedProduct } from "@/components";
+import { CartContext } from "@/context";
 const DetailFood = () => {
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
+  const { addItem } = useContext(CartContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -85,12 +87,7 @@ const DetailFood = () => {
         productId: product.id,
         quantity: quantity,
       };
-      const response = await CartAPI.addCartItem(data);
-      if (response.data.code == 200) {
-        toast.success("Thêm vào giỏ hàng thành công");
-      } else {
-        toast.success("Thêm vào giỏ hàng thất bại");
-      }
+      addItem(data);
     } catch (error) {
       toast.error("Thêm vào giỏ hàng bị lỗi");
     }

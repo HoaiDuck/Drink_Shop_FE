@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -10,7 +10,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Loading } from "@/components";
-
+import { CartContext } from "@/context";
 const ProductSlider = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -18,7 +18,7 @@ const ProductSlider = () => {
   const swiperRef = useRef(null);
   const [showArrows, setShowArrows] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const { addItem } = useContext(CartContext);
   const [hasAnimated, setHasAnimated] = useState(false);
   const controls = useAnimation();
   const [ref, inView] = useInView({ threshold: 0.5 });
@@ -61,18 +61,13 @@ const ProductSlider = () => {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = async (product) => {
+  const handleAddToCart = (product) => {
     try {
       const data = {
         productId: product.id,
         quantity: quantity,
       };
-      const response = await CartAPI.addCartItem(data);
-      if (response.data.code == 200) {
-        toast.success("Thêm vào giỏ hàng thành công");
-      } else {
-        toast.success("Thêm vào giỏ hàng thất bại");
-      }
+      addItem(data);
     } catch (error) {
       toast.error("Thêm vào giỏ hàng bị lỗi");
     }

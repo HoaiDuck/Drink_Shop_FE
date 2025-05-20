@@ -13,9 +13,11 @@ const CartAPI = {
     const url = "carts";
     return instance.put(url, data);
   },
-  deleteBannerByID(data) {
+  deleteCartByID(data) {
     const url = `carts`;
-    return instance.delete(url, data);
+    return instance.delete(url, {
+      data: data,
+    });
   },
 };
 export default CartAPI;

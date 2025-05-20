@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ModalProduct, Loading } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSliders } from "@fortawesome/free-solid-svg-icons";
-import { ProductAPI, CartAPI } from "@/service";
+import { ProductAPI } from "@/service";
 import { toast } from "react-toastify";
+import { CartContext } from "@/context";
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState("DRINK");
   const categories = ["DRINK", "FOOD"];
@@ -18,7 +19,7 @@ const Menu = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Menu");
-
+  const { addItem } = useContext(CartContext);
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
@@ -71,12 +72,7 @@ const Menu = () => {
         productId: product.id,
         quantity: 1,
       };
-      const response = await CartAPI.addCartItem(data);
-      if (response.data.code == 200) {
-        toast.success("Thêm vào giỏ hàng thành công");
-      } else {
-        toast.success("Thêm vào giỏ hàng thất bại");
-      }
+      addItem(data);
     } catch (error) {
       toast.error("Thêm vào giỏ hàng bị lỗi");
     }

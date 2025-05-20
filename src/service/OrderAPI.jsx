@@ -19,11 +19,11 @@ const OrderAPI = {
   },
   setStatus(data) {
     const url = "orders";
-    return instance.get(url, data);
+    return instance.put(url, data);
   },
   getOrderByID(orderID) {
     const url = "orders/{orderID}";
-    return instance.put(url, orderID);
+    return instance.get(url, orderID);
   },
 };
 export default OrderAPI;

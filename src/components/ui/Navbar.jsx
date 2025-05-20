@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Để điều hướng
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart, faBars } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -9,37 +9,20 @@ import {
   SidebarCart,
   NavbarLink,
 } from "@/components/common";
-import { AuthContext } from "@/context";
+import { AuthContext, CartContext } from "@/context";
+
 const Navbar = ({ user }) => {
-  const [cartItems, setCartItems] = useState([]);
   const [isCartVisible, setCartVisible] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [totalItems, setTotalItems] = useState(0);
 
-  const navigate = useNavigate(); // Hook để điều hướng
+  // Lấy thông tin từ CartContext
+  const { totalItems, cartItems, removeItem } = useContext(CartContext);
+
+  const navigate = useNavigate();
 
   const handleCartClick = () => {
     setCartVisible(!isCartVisible);
   };
-
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-  };
-
-  // Hàm cập nhật số lượng sản phẩm từ localStorage
-  const updateTotalItems = () => {
-    const tempCart = JSON.parse(localStorage.getItem("tempCart")) || [];
-    setTotalItems(tempCart.length); // Đếm số lượng sản phẩm (sử dụng length)
-  };
-
-  // Sử dụng useEffect để cập nhật mỗi giây
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updateTotalItems();
-    }, 1000); // Cập nhật mỗi 1 giây
-
-    return () => clearInterval(interval); // Dọn dẹp khi component unmount
-  }, []);
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price, 0);
 
@@ -53,9 +36,11 @@ const Navbar = ({ user }) => {
         <span className="text-black">Bamos</span>
         <span className="text-[#c63402]">Coffee</span>
       </a>
+
       <div className="hidden space-x-6 sm:flex">
         <NavbarLink />
       </div>
+
       <div className="flex items-center space-x-4">
         <SearchItem />
         <UserDropdown />
@@ -74,6 +59,7 @@ const Navbar = ({ user }) => {
           </a>
         )}
       </div>
+
       <div className="item flex">
         <div className="flex items-end pl-3 text-[27px] sm:hidden">
           <button onClick={toggleMobileMenu}>
@@ -81,16 +67,19 @@ const Navbar = ({ user }) => {
           </button>
         </div>
       </div>
+
       <SidebarMenu
         isMobileMenuOpen={isMobileMenuOpen}
         toggleMobileMenu={toggleMobileMenu}
       />
+
       {isCartVisible && (
         <div
           className="fixed left-0 top-0 z-50 h-full w-full bg-black bg-opacity-50"
           onClick={handleCartClick}
         ></div>
       )}
+
       {isCartVisible && (
         <SidebarCart
           cartItems={cartItems}

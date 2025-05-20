@@ -3,70 +3,85 @@ import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
-import { decodeJWT } from "../../util/jwtUtils";
-import Cookies from "js-cookie";
 import { Loading } from "@/components";
-import { AuthContext } from "@/context";
+import { OrderAPI, ProductAPI } from "@/service";
+import { AuthContext, CartContext } from "@/context";
+
 const PaymentPage = () => {
   const location = useLocation();
-  const { cartItems: initialCartItems } = location.state || {};
-  const [cartItems, setCartItems] = useState(initialCartItems || []);
+  const { cartItemsAfter: initialCartItems } = location.state || {};
+  const { user } = useContext(AuthContext);
+  const { cartItems, removeItem } = useContext(CartContext);
+
+  const [cartItemsAfter, setCartItemsAfter] = useState(initialCartItems || []);
   const [selectedPayment, setSelectedPayment] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const { user, fetchUserInfor, setUser } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+
+  const [formData, setFormData] = useState({
+    name: user?.username || "",
+    address: "",
+    number: user?.numbers || "",
+  });
+
   useEffect(() => {
     const savedUserInfo = localStorage.getItem("userInfo");
     if (savedUserInfo) {
-      const userInfo = JSON.parse(savedUserInfo);
-      document.querySelector("input[name='name']").value = userInfo.name || "";
-      document.querySelector("input[name='address']").value =
-        userInfo.address || "";
-      document.querySelector("input[name='number']").value =
-        userInfo.number || "";
+      const parsed = JSON.parse(savedUserInfo);
+      setFormData((prev) => ({
+        ...prev,
+        name: parsed.name || "",
+        address: parsed.address || "",
+        number: parsed.number || "",
+      }));
     }
-
-    localStorage.setItem("tempCart", JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const savedCart = localStorage.getItem("tempCart");
-      if (savedCart) {
-        setCartItems(JSON.parse(savedCart));
-      }
-    }, 2000);
-
-    return () => clearInterval(intervalId);
   }, []);
 
-  if (!cartItems || cartItems.length === 0) {
-    return (
-      <div className="success-container mb-28 mt-20 flex flex-col place-content-center items-center sm:mb-32 sm:mt-32">
-        <FontAwesomeIcon icon={faCartPlus} className="text-7xl text-black" />
-        <h1 className="mt-4 text-center font-josefin text-3xl font-bold">
-          Giỏ hàng của bạn hiện đang không có sản phẩm nào!!!
-        </h1>
-        <p className="mt-2 text-center font-josefin text-lg font-bold">
-          Vui lòng quay trở lại trang chủ để lựa chọn mặt hàng mà bạn yêu thích
-          trước khi vào trang thanh toán.
-        </p>
-        <a
-          href="/menu"
-          className="mt-8 rounded-lg bg-[#d88453] px-6 pb-2 pt-4 font-josefin text-2xl text-white hover:rounded-3xl hover:bg-[#633c02]"
-        >
-          Quay trở lại trang mua sắm
-        </a>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!cartItems || cartItems.length === 0) {
+      setCartItemsAfter([]);
+      setLoading(false);
+      return;
+    }
 
-  const handlePaymentOptionClick = (paymentmethod) => {
-    setSelectedPayment(paymentmethod);
+    const fetchCart = async () => {
+      try {
+        const productDetails = await Promise.all(
+          cartItems.map(async (item) => {
+            const res = await ProductAPI.getProductById(item.productId);
+            const product = res.data?.result;
+            return {
+              productId: item.productId,
+              name: product.name,
+              img: product.imageUrl,
+              price: product.price,
+              quantity: item.quantity,
+              originalQuantity: item.quantity,
+            };
+          })
+        );
+        setCartItemsAfter(productDetails);
+      } catch (error) {
+        console.error("Lỗi khi lấy giỏ hàng:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCart();
+  }, [cartItems]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePaymentOptionClick = (paymentMethod) => {
+    setSelectedPayment(paymentMethod);
   };
 
   const decreaseQuantity = (productId) => {
-    setCartItems(
-      cartItems.map((item) =>
+    setCartItemsAfter((prev) =>
+      prev.map((item) =>
         item.productId === productId && item.quantity > 1
           ? { ...item, quantity: item.quantity - 1 }
           : item
@@ -75,8 +90,8 @@ const PaymentPage = () => {
   };
 
   const increaseQuantity = (productId) => {
-    setCartItems(
-      cartItems.map((item) =>
+    setCartItemsAfter((prev) =>
+      prev.map((item) =>
         item.productId === productId
           ? { ...item, quantity: item.quantity + 1 }
           : item
@@ -87,16 +102,15 @@ const PaymentPage = () => {
   const handleQuantityChange = (e, productId) => {
     const value = e.target.value;
     const numericValue = parseInt(value, 10);
-
     if (!value) {
-      setCartItems((prevCartItems) =>
-        prevCartItems.map((item) =>
+      setCartItemsAfter((prev) =>
+        prev.map((item) =>
           item.productId === productId ? { ...item, quantity: "" } : item
         )
       );
     } else if (!isNaN(numericValue) && numericValue >= 1) {
-      setCartItems((prevCartItems) =>
-        prevCartItems.map((item) =>
+      setCartItemsAfter((prev) =>
+        prev.map((item) =>
           item.productId === productId
             ? { ...item, quantity: numericValue }
             : item
@@ -105,11 +119,7 @@ const PaymentPage = () => {
     }
   };
 
-  const removeItem = (productId) => {
-    setCartItems(cartItems.filter((item) => item.productId !== productId));
-  };
-
-  const calculatedTotalPrice = cartItems.reduce(
+  const calculatedTotalPrice = cartItemsAfter.reduce(
     (total, item) => total + item.quantity * item.price,
     0
   );
@@ -118,40 +128,26 @@ const PaymentPage = () => {
     e.preventDefault();
     setLoading(true);
 
-    const formData = {
-      name: e.target.name.value,
-      address: e.target.address.value,
-      number: e.target.number.value,
-    };
-
     localStorage.setItem("userInfo", JSON.stringify(formData));
 
     const orderData = {
-      name: formData.name,
+      accountId: user.id,
       address: formData.address,
       number: formData.number,
-      paymentMethod: selectedPayment === 1 ? "Bank Transfer" : "Momo QR",
-      finalPrice: calculatedTotalPrice,
-      cart: cartItems.map((item) => ({
+      paymentType: selectedPayment === 1 ? "VNPAY" : "MOMO",
+      listItem: cartItemsAfter.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
-        price: item.price,
       })),
     };
 
     try {
-      const response = await axios.post(
-        "https://bamoscoffeehh.up.railway.app/api/orders",
-        orderData,
-        {
-          withCredentials: true,
-        }
-      );
-      toast(response.data.message);
-      if (response.data.paymentUrl) {
-        window.location.href = response.data.paymentUrl;
-      } else {
-        window.location.href = "/order-success";
+      const response = await OrderAPI.createOrder(orderData);
+      const payUrl = response.data?.result?.orderResponse?.payload?.payUrl;
+      console.log("Check url payment:", orderData);
+      orderData.listItem.map((item) => removeItem(item.productId));
+      if (payUrl) {
+        window.location.href = payUrl;
       }
     } catch (error) {
       console.error("Lỗi khi tạo đơn hàng:", error);
@@ -160,6 +156,29 @@ const PaymentPage = () => {
       setLoading(false);
     }
   };
+
+  if (loading) return <Loading />;
+
+  if (!cartItemsAfter || cartItemsAfter.length === 0) {
+    return (
+      <div className="success-container mb-28 mt-20 flex flex-col items-center text-center">
+        <FontAwesomeIcon icon={faCartPlus} className="text-7xl text-black" />
+        <h1 className="mt-4 font-josefin text-3xl font-bold">
+          Giỏ hàng của bạn hiện đang không có sản phẩm nào!!!
+        </h1>
+        <p className="mt-2 font-josefin text-lg font-bold">
+          Vui lòng quay trở lại trang chủ để lựa chọn mặt hàng yêu thích trước
+          khi vào trang thanh toán.
+        </p>
+        <a
+          href="/menu"
+          className="mt-8 rounded-lg bg-[#d88453] px-6 pb-2 pt-4 font-josefin text-2xl text-white hover:bg-[#633c02]"
+        >
+          Quay lại trang mua sắm
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto mb-20 max-w-[1300px] px-4">
@@ -176,7 +195,7 @@ const PaymentPage = () => {
                 className="h-16 w-full rounded-2xl border border-gray-300 p-2"
                 placeholder="Họ tên"
                 required
-                defaultValue={accountData?.username || ""}
+                defaultValue={user?.username || ""}
               />
             </div>
             <div className="input-payment">
@@ -194,7 +213,7 @@ const PaymentPage = () => {
                 name="number"
                 className="w-full rounded-2xl border border-gray-300 p-2"
                 placeholder="Số điện thoại"
-                defaultValue={accountData?.numbers || ""}
+                defaultValue={user?.numbers || ""}
                 required
               />
             </div>
@@ -304,66 +323,74 @@ const PaymentPage = () => {
             Thông tin sản phẩm
           </h3>
           <div className="mb-4 max-h-[580px] overflow-y-auto rounded-lg bg-white lg:p-4">
-            {cartItems.map((item) => (
-              <div
-                key={item.productId}
-                className="relative mb-4 flex items-center border-b pb-4"
-              >
-                <div className="w-3/12 flex-shrink-0">
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    className="h-20% w-20% rounded-lg object-cover"
-                  />
-                </div>
-                <div className="w-3/5 pl-4 sm:w-[250px] lg:px-4 lg:pl-4">
-                  <span className="line-clamp-1 font-josefin text-2xl font-bold text-[#00561e]">
-                    {item.name}
-                  </span>
-                  <div className="mt-2 flex items-center space-x-2 pt-6">
-                    <button
-                      onClick={() => decreaseQuantity(item.productId)}
-                      className="rounded-full bg-gray-200 px-3 py-1 hover:bg-gray-300"
-                    >
-                      -
-                    </button>
-                    <input
-                      type="text"
-                      value={item.quantity}
-                      onChange={(e) => handleQuantityChange(e, item.productId)}
-                      onBlur={() =>
-                        setCartItems((prevCartItems) =>
-                          prevCartItems.map((item) =>
-                            item.productId === item.productId &&
-                            item.quantity === ""
-                              ? { ...item, quantity: 1 }
-                              : item
-                          )
-                        )
-                      }
-                      className="w-12 rounded border text-center"
+            {cartItemsAfter.length == 0 ? (
+              <p>Giỏ hàng trống.</p>
+            ) : (
+              cartItemsAfter.map((item) => (
+                <div
+                  key={item.productId}
+                  className="relative mb-4 flex items-center border-b pb-4"
+                >
+                  <div className="w-3/12 flex-shrink-0">
+                    <img
+                      src={item.img}
+                      alt={item.name}
+                      className="h-20% w-20% rounded-lg object-cover"
                     />
+                  </div>
+                  <div className="w-3/5 pl-4 sm:w-[250px] lg:px-4 lg:pl-4">
+                    <span className="line-clamp-1 font-josefin text-2xl font-bold text-[#00561e]">
+                      {item.name}
+                    </span>
+                    <div className="mt-2 flex items-center space-x-2 pt-6">
+                      <button
+                        onClick={() => decreaseQuantity(item.productId)}
+                        className="rounded-full bg-gray-200 px-3 py-1 hover:bg-gray-300"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="text"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          handleQuantityChange(e, item.productId)
+                        }
+                        onBlur={() =>
+                          setCartItemsAfter((prevCartItems) =>
+                            prevCartItems.map((item) =>
+                              item.productId === item.productId &&
+                              item.quantity === ""
+                                ? { ...item, quantity: 1 }
+                                : item
+                            )
+                          )
+                        }
+                        className="w-12 rounded border text-center"
+                      />
+                      <button
+                        onClick={() => increaseQuantity(item.productId)}
+                        className="rounded-full bg-gray-200 px-3 py-1 hover:bg-gray-300"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div className="relative w-3/12 text-right">
                     <button
-                      onClick={() => increaseQuantity(item.productId)}
-                      className="rounded-full bg-gray-200 px-3 py-1 hover:bg-gray-300"
+                      className="absolute right-0 top-0 text-2xl text-gray-400 hover:text-black"
+                      onClick={() => {
+                        removeItem(item.productId);
+                      }}
                     >
-                      +
+                      <FontAwesomeIcon icon={faTimes} />
                     </button>
+                    <span className="block pt-16 font-semibold text-black">
+                      {(item.quantity * item.price).toLocaleString()}₫
+                    </span>
                   </div>
                 </div>
-                <div className="relative w-3/12 text-right">
-                  <button
-                    className="absolute right-0 top-0 text-2xl text-gray-400 hover:text-black"
-                    onClick={() => removeItem(item.productId)}
-                  >
-                    <FontAwesomeIcon icon={faTimes} />
-                  </button>
-                  <span className="block pt-16 font-semibold text-black">
-                    {(item.quantity * item.price).toLocaleString()}₫
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           <div className="mb-[5px] flex justify-between font-josefin text-[18px] font-semibold">
