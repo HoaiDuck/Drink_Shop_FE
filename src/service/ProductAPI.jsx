@@ -42,7 +42,7 @@ const ProductAPI = {
       params.append("type", type);
     }
 
-    return instance.get(`/products/search/?${params.toString()}`);
+    return instance.get(`/products/search?${params.toString()}`);
   },
 };
 export default ProductAPI;

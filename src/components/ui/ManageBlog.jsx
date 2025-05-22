@@ -21,49 +21,67 @@ const ManageBlog = () => {
   const [startDateFilter, setStartDateFilter] = useState("");
   const [endDateFilter, setEndDateFilter] = useState("");
   const [dateError, setDateError] = useState("");
+  const fetchBanners = async () => {
+    try {
+      setLoading(true);
 
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        setLoading(true);
-
-        // Validate dates before fetching
-        if (
-          startDateFilter &&
-          endDateFilter &&
-          new Date(endDateFilter) < new Date(startDateFilter)
-        ) {
-          setDateError("Ngày kết thúc phải sau ngày bắt đầu");
-          return;
-        }
-        setDateError("");
-
-        let response;
-        if (statusFilter === "all" && !startDateFilter && !endDateFilter) {
-          response = await BannerAPI.getAllBanners();
-        } else if (statusFilter === "all") {
-          const filter = { startDate: startDateFilter, endDate: endDateFilter };
-          response = await BannerAPI.getBannerByFilter(filter);
-        } else {
-          const filter = {
-            status: statusFilter,
-            startDate: startDateFilter,
-            endDate: endDateFilter,
-          };
-          response = await BannerAPI.getBannerByFilter(filter);
-        }
-        setBannerList(response.data.result || []);
-      } catch (error) {
-        console.error("Error fetching banners:", error);
-        toast.error("Lỗi khi tải danh sách banner");
-      } finally {
-        setLoading(false);
+      // Validate dates before fetching
+      if (
+        startDateFilter &&
+        endDateFilter &&
+        new Date(endDateFilter) < new Date(startDateFilter)
+      ) {
+        setDateError("Ngày kết thúc phải sau ngày bắt đầu");
+        return;
       }
-    };
+      setDateError("");
 
+      let response;
+      if (statusFilter === "all" && !startDateFilter && !endDateFilter) {
+        response = await BannerAPI.getAllBanners();
+      } else if (statusFilter === "all") {
+        const filter = { startDate: startDateFilter, endDate: endDateFilter };
+        response = await BannerAPI.getBannerByFilter(filter);
+      } else {
+        const filter = {
+          status: statusFilter,
+          startDate: startDateFilter,
+          endDate: endDateFilter,
+        };
+        response = await BannerAPI.getBannerByFilter(filter);
+      }
+      setBannerList(response.data.result || []);
+    } catch (error) {
+      console.error("Error fetching banners:", error);
+      toast.error("Lỗi khi tải danh sách banner");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchBanners();
   }, [statusFilter, startDateFilter, endDateFilter]);
 
+  const handleUpdateBanner = async (id, startDate, endDate) => {
+    try {
+      const data = {
+        id: id,
+        startDate: startDate,
+        endDate: endDate,
+      };
+      await BannerAPI.setBannerDisplay(data);
+      toast.success("Cập nhật thời gian banner thành công");
+
+      setBannerList((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, startDate, endDate } : b))
+      );
+      setEditFormVisible(false);
+      fetchBanners();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật thời gian banner:", error);
+      toast.error("Lỗi khi cập nhật thời gian banner");
+    }
+  };
   const handleStartDateChange = (e) => {
     const selectedDate = e.target.value;
     setStartDateFilter(selectedDate);
@@ -320,6 +338,7 @@ const ManageBlog = () => {
                 prev.map((b) => (b.id === updatedBanner.id ? updatedBanner : b))
               );
             }}
+            onUpdateBanner={handleUpdateBanner}
           />
         )}
       </div>

@@ -6,6 +6,7 @@ import { faSliders } from "@fortawesome/free-solid-svg-icons";
 import { ProductAPI } from "@/service";
 import { toast } from "react-toastify";
 import { CartContext } from "@/context";
+import { Button, Popover, Space } from "antd";
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState("DRINK");
   const categories = ["DRINK", "FOOD"];
@@ -20,6 +21,83 @@ const Menu = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Menu");
   const { addItem } = useContext(CartContext);
+  const applyPriceFilter = async (min, max) => {
+    setIsLoading(true);
+    try {
+      const data = {
+        minimumPrice: min,
+        maxPrice: max,
+      };
+      const response = await ProductAPI.searchProduct(data);
+      if (response.data.code === 200) {
+        setProducts(response.data.result);
+        setCurrentPage(1);
+      } else {
+        setProducts([]);
+      }
+    } catch (error) {
+      console.error("Lỗi khi lọc sản phẩm theo giá:", error);
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const content = (
+    <div className="flex flex-col gap-2 w-48">
+      <button
+        onClick={() => applyPriceFilter(0, 10000)}
+        className="text-left px-3 py-1 hover:bg-[#f5f5f5] rounded-md"
+      >
+        ... → 10.000 VND
+      </button>
+      <button
+        onClick={() => applyPriceFilter(10000, 20000)}
+        className="text-left px-3 py-1 hover:bg-[#f5f5f5] rounded-md"
+      >
+        10.000 VND → 20.000 VND
+      </button>
+      <button
+        onClick={() => applyPriceFilter(20000, 30000)}
+        className="text-left px-3 py-1 hover:bg-[#f5f5f5] rounded-md"
+      >
+        20.000 VND → 30.000 VND
+      </button>
+      <button
+        onClick={() => applyPriceFilter(30000, 40000)}
+        className="text-left px-3 py-1 hover:bg-[#f5f5f5] rounded-md"
+      >
+        30.000 VND → 40.000 VND
+      </button>
+      <button
+        onClick={() => applyPriceFilter(40000, null)}
+        className="text-left px-3 py-1 hover:bg-[#f5f5f5] rounded-md"
+      >
+        40.000 VND → ...
+      </button>
+      <button
+        onClick={async () => {
+          setCurrentPage(1);
+          setIsLoading(true);
+          try {
+            const response = await ProductAPI.getAllProducts();
+            if (response.data.code === 200) {
+              setProducts(response.data.result);
+            } else {
+              setProducts([]);
+            }
+          } catch (err) {
+            console.error("Lỗi khi reset bộ lọc:", err);
+            setProducts([]);
+          } finally {
+            setIsLoading(false);
+          }
+        }}
+        className="text-left px-3 py-1 text-red-600 hover:bg-[#f5f5f5] rounded-md"
+      >
+        Xóa bộ lọc
+      </button>
+    </div>
+  );
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
@@ -134,11 +212,11 @@ const Menu = () => {
         )}
 
         {/* Menu cho desktop */}
-        <div className="hidden justify-center font-bold md:flex">
+        <div className="hidden md:flex items-center justify-center gap-3 mt-8 font-bold">
           {categories.map((category) => (
             <button
               key={category}
-              className={`mt-8 border-[0.5px] border-gray-300 px-5 py-2 text-base transition-all ease-linear ${
+              className={`border-[0.5px] border-gray-300 px-5 py-2 text-base transition-all ease-linear ${
                 activeCategory === category
                   ? "border-[#633c02] bg-[#633c02] text-white"
                   : "bg-white text-gray-800"
@@ -148,6 +226,23 @@ const Menu = () => {
               {category}
             </button>
           ))}
+
+          {/* Nút Lọc */}
+          <Popover
+            className="flex items-center gap-2 border-gray-300 bg-white px-4 py-2"
+            content={content}
+            title="Các mức giá"
+            trigger="click"
+          >
+            <Button className=" border rounded-md  text-base text-gray-800 shadow-sm hover:bg-gray-50 hover:shadow-md transition-all duration-300">
+              <img
+                src="https://cdnv2.tgdd.vn/webmwg/2024/ContentMwg/images/category_v2/filter.png"
+                alt="Filter Icon"
+                className="w-4 h-4"
+              />
+              <span>Lọc</span>
+            </Button>
+          </Popover>
         </div>
       </div>
 

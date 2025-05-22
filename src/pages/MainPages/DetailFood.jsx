@@ -153,18 +153,19 @@ const DetailFood = () => {
         {/* Right Section */}
         <div className="w-[370px] pl-6 pt-16 md:w-[290px] lg:w-[400px] lg:pl-2">
           <h3 className="text-center font-josefin text-3xl font-bold text-[#663402] md:text-start">
-            Danh mục thực đơn
+            Mô tả:
           </h3>
+          <div className="mt-4 rounded-lg bg-[#fff8ee] p-4 shadow-sm ring-1 ring-[#e6d3bb]">
+            <p className="font-josefin text-lg  text-[#00561e] md:pl-0 lg:w-[393px]">
+              {product.description}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Review Section */}
       <div className="mt-8">
         <Review productId={product.id} />
-      </div>
-
-      <div>
-        <RelatedProduct productId={product.id} />
       </div>
     </div>
   );

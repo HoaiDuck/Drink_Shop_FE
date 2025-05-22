@@ -17,6 +17,10 @@ const BannerAPI = {
     const url = "banners";
     return instance.put(url, data);
   },
+  setBannerDisplay(data) {
+    const url = "banners/setBanner";
+    return instance.put(url, data);
+  },
   deleteBannerByID(id) {
     const url = `banners/${id}`;
     return instance.delete(url, id);
