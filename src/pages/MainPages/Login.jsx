@@ -24,30 +24,37 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage("");
+
     try {
       const response = await AuthApi.login({ username, password });
+
+      if (response?.data?.code !== 200) {
+        setErrorMessage(response?.data?.message || "Đăng nhập thất bại");
+        return;
+      }
+
       const authMe = await AuthApi.authMe();
       setUser(authMe.data.result);
-      if (response.data.code == 200) {
-        toast.success("Đăng nhập thành công!");
-        const checkRole = await AuthApi.authMe();
-        if (checkRole.data.result.role === "ADMIN") {
-          navigate("/admin");
-        } else {
-          navigate("/customerprofile");
-        }
+
+      toast.success("Đăng nhập thành công!");
+
+      if (authMe.data.result.role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/customerprofile");
       }
     } catch (error) {
-      if (error.response && error.response.data) {
-        setErrorMessage(error.response.data.message);
-      } else {
-        setErrorMessage("Đã xảy ra lỗi. Vui lòng thử lại.");
-      }
+      console.log("Login error:", error);
+      setErrorMessage(
+        error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin."
+      );
     } finally {
       setLoading(false);
     }
   };
-
   const handleRegister = async (e) => {
     e.preventDefault();
 

@@ -1,12 +1,33 @@
 import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-regular-svg-icons";
+import { useSearchParams } from "react-router-dom";
+import { OrderAPI } from "@/service";
+import { toast } from "react-toastify";
 
 const OrderSuccess = () => {
+  const [searchParams] = useSearchParams();
+
   useEffect(() => {
-    localStorage.removeItem("tempCart");
-    localStorage.removeItem("userInfo");
-    localStorage.removeItem("couponCode");
+    const vnp_TxnRef = searchParams.get("vnp_TxnRef");
+    const vnp_ResponseCode = searchParams.get("vnp_ResponseCode");
+    const fetchData = async () => {
+      try {
+        const data = {
+          id: vnp_TxnRef,
+          status: "SUCCESS",
+        };
+        const response = await OrderAPI.setStatus(data);
+        console.log("Check after payment:", response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (vnp_TxnRef && vnp_ResponseCode === "00") {
+      fetchData();
+    } else {
+      toast.error("Lỗi khi xác thực thanh toán!");
+    }
   }, []);
 
   return (

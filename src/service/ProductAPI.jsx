@@ -22,7 +22,7 @@ const ProductAPI = {
     return instance.post(url, data);
   },
   getProductById(id) {
-    const url = "products/{id}";
+    const url = `products/${id}`;
     return instance.get(url, id);
   },
   searchProduct({ keyword = "", minimumPrice, maxPrice, type }) {
@@ -42,7 +42,7 @@ const ProductAPI = {
       params.append("type", type);
     }
 
-    return instance.get(`/products/search/?${params.toString()}`);
+    return instance.get(`/products/search?${params.toString()}`);
   },
 };
 export default ProductAPI;

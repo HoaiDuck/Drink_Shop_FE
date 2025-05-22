@@ -9,8 +9,8 @@ import {
   faChevronRight,
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
-import {Loading} from "@/components"; // Import Loading component
+import { BannerAPI } from "@/service";
+import { Loading } from "@/components"; // Import Loading component
 
 const BannerSwiper = () => {
   const navigate = useNavigate();
@@ -22,10 +22,10 @@ const BannerSwiper = () => {
     // Fetch the banner blogs from the API
     const fetchBannerBlogs = async () => {
       try {
-        const response = await axios.get(
-          "https://bamoscoffeehh.up.railway.app/api/blogs/bannerBlogs",
-        );
-        setBlogs(response.data.data); // Lưu dữ liệu vào state
+        const response = await BannerAPI.getBannerByFilter({
+          status: "ACTIVE",
+        });
+        setBlogs(response.data.result); // Lưu dữ liệu vào state
       } catch (error) {
         console.error("Error fetching banner blogs:", error);
       } finally {
@@ -80,7 +80,7 @@ const BannerSwiper = () => {
                 onClick={() => navigate(`/blogs/${blog._id}`)}
               >
                 <img
-                  src={blog.image}
+                  src={blog.url}
                   alt={blog.title}
                   className="h-full w-full object-cover lg:h-[460px] lg:object-contain"
                 />

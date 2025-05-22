@@ -1,15 +1,16 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
 import ModalProduct from "./ModalProduct";
-import axios from "axios";
+import { ProductAPI, CartAPI } from "@/service";
+import { toast } from "react-toastify";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Loading } from "@/components";
-
+import { CartContext } from "@/context";
 const ProductSlider = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -17,7 +18,7 @@ const ProductSlider = () => {
   const swiperRef = useRef(null);
   const [showArrows, setShowArrows] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const { addItem } = useContext(CartContext);
   const [hasAnimated, setHasAnimated] = useState(false);
   const controls = useAnimation();
   const [ref, inView] = useInView({ threshold: 0.5 });
@@ -32,12 +33,21 @@ const ProductSlider = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1); // hôm qua
+
+        const past = new Date(yesterday);
+        past.setDate(yesterday.getDate() - 29); // 29 ngày trước hôm qua
+        const format = (date) => date.toISOString().split("T")[0]; // yyyy-mm-dd
+        const time = {
+          startDate: format(past),
+          endDate: format(yesterday),
+        };
         setLoading(true);
-        const response = await axios.get(
-          "https://bamoscoffeehh.up.railway.app/api/mainPages"
-        );
-        if (response.data.success) {
-          setProducts(response.data.data);
+        const response = await ProductAPI.getTopSellingProduct(time);
+        console.log(">>CHECK product Response:", response);
+        if (response.data.code === 200) {
+          setProducts(response.data.result);
         } else {
           console.error("Failed to fetch products.");
         }
@@ -52,7 +62,15 @@ const ProductSlider = () => {
   }, []);
 
   const handleAddToCart = (product) => {
-    setSelectedProduct(product);
+    try {
+      const data = {
+        productId: product.id,
+        quantity: quantity,
+      };
+      addItem(data);
+    } catch (error) {
+      toast.error("Thêm vào giỏ hàng bị lỗi");
+    }
   };
 
   const handleCloseModal = () => {
@@ -92,7 +110,7 @@ const ProductSlider = () => {
           }}
         >
           {products.map((product, index) => (
-            <SwiperSlide key={product._id}>
+            <SwiperSlide key={product.id}>
               <motion.div
                 className="product-card group relative flex h-[350px] flex-col justify-between border-l border-r border-[#e7e6e6] bg-white p-4 text-center hover:border-l-2 hover:border-r-2 hover:border-t-2 hover:border-[#d5d5d5]"
                 initial="hidden"
@@ -111,9 +129,9 @@ const ProductSlider = () => {
                 }}
               >
                 <div className="product-image">
-                  <Link to={`/detailfood/${product._id}`}>
+                  <Link to={`/detailfood/${product.id}`}>
                     <img
-                      src={product.image}
+                      src={product.imageUrl}
                       alt={product.name}
                       className="mx-auto h-[223px] transform transition-transform duration-300 ease-in-out group-hover:scale-110"
                     />
@@ -124,7 +142,7 @@ const ProductSlider = () => {
                 </div>
                 <div className="product-info mb-10 mt-2">
                   <h6 className="product-name font-josefin text-xl line-clamp-1 font-bold text-[#00561e]">
-                    <Link to={`/detailfood/${product._id}`}>
+                    <Link to={`/detailfood/${product.id}`}>
                       {product.name.split(" ").slice(0, 4).join(" ")}
                       {/* Giới hạn 20 từ */}
                       {product.name.split(" ").length > 4 && "..."}{" "}
@@ -134,13 +152,8 @@ const ProductSlider = () => {
 
                   <div className="product-price">
                     <span className="font-josefin text-base font-bold text-[#9d6817]">
-                      {product.sell_price.toLocaleString()} đ
+                      {product.price.toLocaleString("vi-VN")} đ
                     </span>
-                    {product.price !== product.sell_price && (
-                      <span className="price-old ml-2 text-sm font-bold text-[#999] line-through">
-                        {product.price.toLocaleString()} đ
-                      </span>
-                    )}
                   </div>
                 </div>
 

@@ -74,7 +74,7 @@ const router = createBrowserRouter([
         element: <DetailBlog />,
       },
       {
-        path: " detailfood/:id",
+        path: "detailfood/:id",
         element: <DetailFood />,
       },
       {

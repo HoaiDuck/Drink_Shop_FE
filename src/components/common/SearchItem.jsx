@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
 import { Loading } from "@/components";
 import { Link } from "react-router-dom";
-
+import { ProductAPI } from "@/service";
 const SearchItem = () => {
   const [searchTerm, setSearchTerm] = useState(""); // State for search term
   const [products, setProducts] = useState([]); // State to store search results
@@ -28,10 +27,13 @@ const SearchItem = () => {
       setError(null);
 
       try {
-        const response = await axios.get(
-          `https://bamoscoffeehh.up.railway.app/api/products?searchTerm=${searchTerm}`
-        );
-        setProducts(response.data.data); // Update products state
+        console.log("Check search:", searchTerm);
+        const data = {
+          keyword: searchTerm,
+        };
+        const response = await ProductAPI.searchProduct(data);
+        console.log("Check search response:", response);
+        setProducts(response.data.result);
       } catch (error) {
         setError("Error fetching products.");
       } finally {
@@ -85,18 +87,18 @@ const SearchItem = () => {
               <ul className="max-h-96 overflow-y-auto">
                 {products.map((product) => (
                   <li
-                    key={product._id}
+                    key={product.id}
                     className="border-b border-gray-200 py-2"
                   >
                     <Link
-                      to={`/detailfood/${product._id}`}
+                      to={`/detailfood/${product.id}`}
                       className="block hover:bg-gray-100"
                     >
                       <div className="flex items-center space-x-4">
                         {/* Image Section */}
                         <div className="h-24 w-[60px]">
                           <img
-                            src={product.image}
+                            src={product.imageUrl}
                             alt={product.name}
                             className="h-24 w-auto rounded-md object-cover"
                           />
@@ -111,7 +113,7 @@ const SearchItem = () => {
 
                           {/* Product Price */}
                           <div className="mt-4 font-josefin text-lg font-bold text-[#925802]">
-                            {product.sell_price.toLocaleString()} ₫
+                            {product.price.toLocaleString()} ₫
                           </div>
                         </div>
                       </div>

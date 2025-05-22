@@ -36,8 +36,16 @@ instance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Nếu access_token hết hạn và chưa retry
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Nếu là lỗi 401 và request không phải là "auth/login" hoặc "auth/register"
+    const isLoginRequest =
+      originalRequest.url?.includes("auth/login") ||
+      originalRequest.url?.includes("auth/register");
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isLoginRequest
+    ) {
       originalRequest._retry = true;
 
       if (!isRefreshing) {
@@ -54,17 +62,53 @@ instance.interceptors.response.use(
         }
       }
 
-      // Hàng đợi các request cần retry
       return new Promise((resolve) => {
         addRefreshSubscriber((token) => {
           originalRequest.headers.Authorization = `Bearer ${token}`;
-          resolve(instance(originalRequest)); // retry request
+          resolve(instance(originalRequest));
         });
       });
     }
 
+    // Với các lỗi khác (đặc biệt là 401 từ login) → cho phép truyền lỗi ra ngoài
     return Promise.reject(error);
   }
 );
-
 export default instance;
+
+//// Code bị sai
+// instance.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+
+//     // Nếu access_token hết hạn và chưa retry
+//     if (error.response?.status === 401 && !originalRequest._retry) {
+//       originalRequest._retry = true;
+
+//       if (!isRefreshing) {
+//         isRefreshing = true;
+//         try {
+//           const res = await AuthApi.refreshToken();
+//           const newAccessToken = res.data.access_token;
+//           localStorage.setItem("access_token", newAccessToken);
+//           isRefreshing = false;
+//           onRefreshed(newAccessToken);
+//         } catch (refreshError) {
+//           isRefreshing = false;
+//           return Promise.reject(refreshError);
+//         }
+//       }
+
+//       // Hàng đợi các request cần retry
+//       return new Promise((resolve) => {
+//         addRefreshSubscriber((token) => {
+//           originalRequest.headers.Authorization = Bearer ${token};
+//           resolve(instance(originalRequest)); // retry request
+//         });
+//       });
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
