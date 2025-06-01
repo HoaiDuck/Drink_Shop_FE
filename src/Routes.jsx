@@ -10,7 +10,7 @@ import {
   PaymentPage,
   Admin,
   OrderFail,
-  OrderSuccess,
+  OrderResponse,
   Login,
   ForgotPassword,
   CustomerProfile,
@@ -82,8 +82,8 @@ const router = createBrowserRouter([
         element: <PaymentPage />,
       },
       {
-        path: "order-success",
-        element: <OrderSuccess />,
+        path: "order-response",
+        element: <OrderResponse />,
       },
       {
         path: "order-fail",

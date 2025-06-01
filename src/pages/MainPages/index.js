@@ -6,7 +6,7 @@ export { default as DetailFood } from "@/pages/MainPages/DetailFood";
 export { default as BlogMain } from "@/pages/MainPages/BlogMain";
 export { default as DetailBlog } from "@/pages/MainPages/DetailBlog";
 export { default as PaymentPage } from "@/pages/MainPages/PaymentPage";
-export { default as OrderSuccess } from "@/pages/MainPages/OrderSuccess";
+export { default as OrderResponse } from "@/pages/MainPages/OrderResponse";
 export { default as OrderFail } from "@/pages/MainPages/OrderFail";
 export { default as Login } from "@/pages/MainPages/Login";
 export { default as ForgotPassword } from "@/pages/MainPages/ModalForgotPassword";

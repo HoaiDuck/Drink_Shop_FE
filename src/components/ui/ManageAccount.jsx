@@ -1,121 +1,98 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-  faPen,
-  faToggleOn,
-  faToggleOff,
-} from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
-import Cookies from "js-cookie";
+import { faPlus, faPen, faToggleOn, faToggleOff } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
-import { AddAccount, UpdateAccount, Loading } from "@/components";
+import { Loading } from "@/components";
+import { AccountAPI } from "@/service";
+
 const ManageAccount = () => {
   const [accounts, setAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isAddFormVisible, setAddFormVisible] = useState(false);
-  const [isUpdateFormVisible, setUpdateFormVisible] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const [searchType, setSearchType] = useState("name");
 
   useEffect(() => {
-    const fetchAccounts = async () => {
-      setLoading(true); // Bắt đầu hiển thị loading
-      try {
-        const response = await axios.get(
-          "https://bamoscoffeehh.up.railway.app/api/accounts",
-          {
-            withCredentials: true,
-          }
-        );
-        setAccounts(response.data.data);
-      } catch (error) {
-        console.error("Error fetching accounts:", error);
-      } finally {
-        setLoading(false); // Kết thúc loading sau khi lấy dữ liệu xong
-      }
-    };
-
     fetchAccounts();
   }, []);
 
-  const filteredAccounts = accounts.filter(
-    (account) =>
-      (selectedStatus === null || account.isActive === selectedStatus) &&
-      (account.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        account.gmail.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  useEffect(() => {
+    setSearchTerm("");
+  }, [searchType]);
 
-  const toggleIsActive = async (id) => {
-    const updatedAccount = accounts.find((account) => account._id === id);
-    const newIsActive = updatedAccount.isActive === 1 ? 2 : 1;
+  useEffect(() => {
+    if (searchTerm || selectedStatus !== null) {
+      handleSearchAndFilter();
+    } else {
+      fetchAccounts();
+    }
+  }, [searchTerm, selectedStatus]);
 
+  useEffect(() => {
+    if (searchTerm) {
+      setSelectedStatus(null);
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (selectedStatus !== null) {
+      setSearchTerm("");
+    }
+  }, [selectedStatus]);
+
+  const fetchAccounts = async () => {
+    setLoading(true);
     try {
-      // Gửi yêu cầu cập nhật trạng thái `isActive`
-      await axios.put(
-        `https://bamoscoffeehh.up.railway.app/api/accounts/${id}`,
-        { isActive: newIsActive },
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("jwtToken")}`,
-          },
-          withCredentials: true,
-        }
-      );
-
-      // Cập nhật trạng thái trong state
-      setAccounts((prevAccounts) =>
-        prevAccounts.map((account) =>
-          account._id === id ? { ...account, isActive: newIsActive } : account
-        )
-      );
+      const response = await AccountAPI.getAllAccounts();
+      setAccounts(response.data.result || []);
     } catch (error) {
-      console.error("Error updating isActive:", error);
-      toast.error(
-        error.response?.data?.message || "Có lỗi xảy ra khi cập nhật"
-      );
+      console.error("Lỗi khi lấy danh sách tài khoản:", error);
+    } finally {
+      setLoading(false);
     }
   };
+const handleSearchAndFilter = async () => {
+  setLoading(true);
+  try {
+    const params = {
+      phoneNumber: searchType === 'phoneNumber' ? searchTerm : '',
+      username: searchType === 'username' ? searchTerm : '',
+      name: searchType === 'name' ? searchTerm : '',
+      deleted: selectedStatus === null ? '' : 
+              selectedStatus === true ? 'false' : 'true'
+    };
 
-  const handleAddAccount = async (newAccount) => {
-    try {
-      const response = await axios.post(
-        "https://bamoscoffeehh.up.railway.app/api/accounts",
-        newAccount,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("jwtToken")}`,
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.data.success) {
-        setAccounts([...accounts, response.data.data]);
-        toast.success("Thêm nhân viên thành công");
-      } else {
-        toast.error(response.data.message || "Có lỗi xảy ra");
-      }
-      return response.data; // Return the response to be used by AddAccount
-    } catch (error) {
-      console.error("Error adding account:", error.response);
-      toast.error(error.response?.data?.message || "Có lỗi xảy ra");
-      throw error; // Throw the error so AddAccount can catch it
+    const response = await AccountAPI.searchAccount(params);
+    // Luôn set kết quả từ API, kể cả khi rỗng
+    setAccounts(response.data.result || []);
+    
+    // Hiển thị thông báo nếu không có kết quả
+    if (response.data.result && response.data.result.length === 0) {
+      toast.info("Không tìm thấy tài khoản phù hợp");
     }
-  };
+  } catch (error) {
+    console.error("Lỗi khi tìm kiếm/lọc tài khoản:", error);
+    // Khi có lỗi, set danh sách rỗng thay vì gọi fetchAccounts()
+    setAccounts([]);
+    toast.error("Có lỗi xảy ra khi tìm kiếm");
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const handleUpdateAccount = (updatedAccount) => {
-    setAccounts((prevAccounts) =>
-      prevAccounts.map((account) =>
-        account._id === updatedAccount._id ? updatedAccount : account
-      )
-    );
-  };
-
-  const openUpdateForm = (account) => {
-    setSelectedAccount(account);
-    setUpdateFormVisible(true);
+  const toggleIsActive = async (id, currentDeletedStatus) => {
+    try {
+      const updated = {
+        id: id,
+        deleted: !currentDeletedStatus,
+      };
+      await AccountAPI.setAccountStatus(updated);
+      fetchAccounts();
+      toast.success("Cập nhật trạng thái thành công");
+    } catch (error) {
+      console.error("Failed to update status", error);
+      toast.error("Cập nhật trạng thái thất bại");
+    }
   };
 
   return (
@@ -123,146 +100,96 @@ const ManageAccount = () => {
       <div className="h-[600px] w-full max-w-7xl rounded-lg bg-white p-4 shadow-lg">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center">
+            <select
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
+              className="mr-2 rounded-md border border-gray-300 p-2"
+            >
+              <option value="name">Tên</option>
+              <option value="username">Username</option>
+              <option value="phoneNumber">Số điện thoại</option>
+            </select>
+            
             <input
               type="text"
-              placeholder="Tìm kiếm bằng tên, email và vai trò"
+              placeholder={`Tìm kiếm theo ${searchType === 'name' ? 'tên' : searchType === 'username' ? 'username' : 'số điện thoại'}`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-72 rounded-md border border-gray-300 p-2"
             />
-            <span className="ml-8 pt-3 font-josefin text-2xl font-bold">
-              Lọc:
-            </span>
+            
+            <span className="ml-8 pt-3 font-josefin text-2xl font-bold">Lọc:</span>
             <select
               className="ml-4 rounded-md border border-gray-300 p-2"
-              value={selectedStatus || ""}
-              onChange={(e) =>
-                setSelectedStatus(
-                  e.target.value === "" ? null : Number(e.target.value)
-                )
+              value={selectedStatus ?? ""}
+              onChange={(e) => 
+                setSelectedStatus(e.target.value === "" ? null : e.target.value === "true")
               }
             >
               <option value="">Tất cả</option>
-              <option value="2">Đang hoạt động</option>
-              <option value="1">Tắt hoạt động</option>
+              <option value="true">Đang hoạt động</option>
+              <option value="false">Tắt hoạt động</option>
             </select>
           </div>
-
-          <div className="group relative">
-            <button
-              onClick={() => setAddFormVisible(true)}
-              className="rounded-full bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            >
-              <FontAwesomeIcon icon={faPlus} />
-            </button>
-            <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 transform whitespace-nowrap rounded-md bg-gray-800 px-4 py-2 text-sm text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-              Tạo tài khoản
-            </span>
-          </div>
         </div>
+
         {loading ? (
-          // Hiển thị phần loading nếu dữ liệu chưa được tải
           <div className="flex h-[255px] w-full items-center justify-center lg:h-[300px]">
-            <Loading /> {/* Hiển thị Loading khi đang tải dữ liệu */}
+            <Loading />
           </div>
         ) : (
           <div className="overflow-x-auto rounded-lg shadow-md">
-            {/* Phần tiêu đề cố định */}
-            <table className="min-w-full table-auto">
+           
+
+ <table className="min-w-full table-auto">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="w-[110px] px-4 py-3 text-center">
-                    Tên người dùng
-                  </th>
-                  <th className="w-[100px] px-4 py-3 text-center">
-                    Số điện thoại
-                  </th>
-                  <th className="w-[220px] px-4 py-3 text-center">Gmail</th>
-                  <th className="w-[100px] px-4 py-3 text-center">Vai trò</th>
-                  <th className="w-[100px] px-4 py-3 text-center">
-                    Ngày cập nhật
-                  </th>
-                  <th className="w-[100px] px-4 py-3 text-center">Hoạt động</th>
-                  <th className="w-[100px] px-4 py-3 text-center">Chỉnh sửa</th>
+                  <th className="px-4 py-3 text-center">Tên người dùng</th>
+                  <th className="px-4 py-3 text-center">Số điện thoại</th>
+                  <th className="px-4 py-3 text-center">Username</th>
+                  <th className="px-4 py-3 text-center">Vai trò</th>
+                  <th className="px-4 py-3 text-center">Hoạt động</th>
                 </tr>
               </thead>
-            </table>
-
-            {/* Phần nội dung cuộn */}
-            <div className="max-h-[470px] overflow-y-auto">
-              <table className="min-w-full table-auto">
-                <tbody>
-                  {filteredAccounts.map((account) => (
-                    <tr key={account._id} className="border-b">
-                      <td className="w-[160px] px-4 py-6 text-center font-bold">
-                        {account.username}
-                      </td>
-                      <td className="w-[170px] px-4 py-6 text-center">
-                        {account.numbers}
-                      </td>
-                      <td className="w-[160px] px-4 py-6 text-center">
-                        {account.gmail}
-                      </td>
-                      <td className="w-[160px] px-4 py-6 text-center">
-                        {account.role}
-                      </td>
-                      <td className="w-[160px] px-4 py-6 text-center">
-                        {new Date(account.updatedAt).toLocaleDateString()}
-                      </td>
-                      <td className="w-[160px] px-4 py-6 text-center text-2xl">
-                        <div className="group relative">
+              <tbody>
+                {accounts.map((account) => (
+                  <tr key={account.id} className="border-b">
+                    <td className="px-4 py-3 text-center font-bold">{account.name || account.username}</td>
+                    <td className="px-4 py-3 text-center">{account.phoneNumber}</td>
+                    <td className="px-4 py-3 text-center">{account.username}</td>
+                    <td className="px-4 py-3 text-center">{account.role}</td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="group relative flex justify-center">
+                        {account.role === "ADMIN" ? (
                           <FontAwesomeIcon
-                            icon={
-                              account.isActive === 2 ? faToggleOn : faToggleOff
-                            }
-                            className={
-                              account.isActive === 2
-                                ? "cursor-pointer text-green-500"
-                                : "cursor-pointer text-gray-400"
-                            }
-                            onClick={() => toggleIsActive(account._id)}
+                            icon={account.deleted ? faToggleOff : faToggleOn}
+                            className="text-gray-300 text-2xl cursor-not-allowed"
                           />
-                          <span className="absolute left-[-80%] top-1/2 -translate-y-1/2 transform whitespace-nowrap rounded-md bg-gray-800 px-2 py-2 text-sm text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                            Bật hoạt động
-                          </span>
-                        </div>
-                      </td>
-                      <td className="w-[160px] px-4 py-6 text-center text-xl">
-                        <div className="group relative">
-                          <button
-                            onClick={() => openUpdateForm(account)}
-                            className="rounded-full px-3 py-1 text-blue-400 hover:bg-slate-300"
-                          >
-                            <FontAwesomeIcon icon={faPen} />
-                          </button>
-                          <span className="absolute left-[-50%] top-1/2 -translate-y-1/2 transform whitespace-nowrap rounded-md bg-gray-800 px-2 py-2 text-sm text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                            Chỉnh sửa
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        ) : (
+                          <>
+                            <FontAwesomeIcon
+                              icon={account.deleted ? faToggleOff : faToggleOn}
+                              className={
+                                account.deleted
+                                  ? "cursor-pointer text-gray-400 text-2xl"
+                                  : "cursor-pointer text-green-500 text-2xl"
+                              }
+                              onClick={() => toggleIsActive(account.id, account.deleted)}
+                            />
+                            <span className="absolute top-full mt-1 left-1/2 transform -translate-x-1/2 rounded bg-gray-800 px-2 py-1 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100 z-10">
+                              {account.deleted ? "Kích hoạt" : "Vô hiệu hóa"}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
-
-      {isAddFormVisible && (
-        <AddAccount
-          onClose={() => setAddFormVisible(false)}
-          onAddAccount={handleAddAccount}
-        />
-      )}
-
-      {isUpdateFormVisible && (
-        <UpdateAccount
-          account={selectedAccount}
-          onClose={() => setUpdateFormVisible(false)}
-          onUpdateAccount={handleUpdateAccount}
-        />
-      )}
     </div>
   );
 };

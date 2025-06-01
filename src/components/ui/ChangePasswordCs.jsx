@@ -1,25 +1,22 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { AuthApi } from "@/service";
 
 const ChangePasswordCs = ({ onClose, onUpdateSuccess }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showOldPassword, setShowOldPassword] = useState(false); // Hiển thị mật khẩu cũ
-  const [showNewPassword, setShowNewPassword] = useState(false); // Hiển thị mật khẩu mới
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Hiển thị mật khẩu xác nhận
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
 
-    // Kiểm tra mật khẩu mới phải có ít nhất 8 ký tự
     if (newPassword.length < 8) {
       setError("Mật khẩu mới phải có ít nhất 8 ký tự!");
       return;
@@ -31,29 +28,22 @@ const ChangePasswordCs = ({ onClose, onUpdateSuccess }) => {
     }
 
     try {
-      const response = await axios.post(
-        "https://bamoscoffeehh.up.railway.app/api/auth/change-password",
-        {
-          oldPassword,
-          newPassword,
-          confirmNewPassword: confirmPassword,
-        },
-        { withCredentials: true },
-      );
+      const user = await Auth.authMe(); 
+      const updatedUser = {
+        ...user.result,
+        password: newPassword,
+      };
 
-      if (response.data.success) {
+      const response = await AuthApi.updateAccount(updatedUser);
+      if (response.data.code === 200) {
         toast.success("Đổi mật khẩu thành công!");
         onUpdateSuccess();
-        setTimeout(() => {
-          onClose();
-        }, 500);
+        onClose();
       } else {
-        setError(response.data.message || "Đã xảy ra lỗi!");
+        toast.error("Không thể đổi mật khẩu!");
       }
     } catch (error) {
-      setError(
-        error.response?.data?.message || "Không thể đổi mật khẩu. Thử lại sau!",
-      );
+      toast.error("Lỗi khi đổi mật khẩu!");
     }
   };
 
@@ -120,11 +110,6 @@ const ChangePasswordCs = ({ onClose, onUpdateSuccess }) => {
 
           {error && (
             <p className="mt-4 font-josefin text-lg text-red-500">{error}</p>
-          )}
-          {success && (
-            <p className="mt-4 font-josefin text-lg text-green-500">
-              {success}
-            </p>
           )}
 
           <div className="flex justify-between pt-4">

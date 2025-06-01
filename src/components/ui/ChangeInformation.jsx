@@ -6,13 +6,14 @@ const ChangeInformation = ({ onClose, onUpdateSuccess }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [user, setUser] = useState({
-    id: "241e1d9b-257c-4dd2-a17b-0707f52d35ea",
-    name: "duck",
-    birthday: "1990-05-15",
-    username: "duck12345",
-    phoneNumber: "0333333333",
-    gender: "MALE",
-    role: "CUSTOMER",
+    id: "",
+    name: "",
+    birthday: "",
+    username: "",
+    password: "",
+    phoneNumber: "",
+    gender: "",
+    role: "",
   });
 
   useEffect(() => {
@@ -21,9 +22,8 @@ const ChangeInformation = ({ onClose, onUpdateSuccess }) => {
         const response = await AuthApi.authMe();
         if (response.data.code == 200) {
           setUser({
-            ...user,
-            username: response.data.result.username,
-            phoneNumber: response.data.result.phoneNumber,
+              ...response.data.result,
+              password: "only_update_normal_information",
           });
         } else {
           toast.error("Không thể tải thông tin tài khoản!");
@@ -42,10 +42,6 @@ const ChangeInformation = ({ onClose, onUpdateSuccess }) => {
     e.preventDefault();
     setError("");
 
-    if (!user.id) {
-      toast.error("Token không hợp lệ!");
-      return;
-    }
 
     if (!user.username && !user.phoneNumber) {
       setError(
@@ -63,8 +59,9 @@ const ChangeInformation = ({ onClose, onUpdateSuccess }) => {
       return;
     }
     try {
-      const response = await AuthApi.updateAccount({});
-      if (response.data.success) {
+      
+      const response = await AuthApi.updateAccount(user);
+      if (response.data.code ===200) {
         toast.success("Cập nhật thông tin thành công!");
         onUpdateSuccess();
         onClose();
@@ -89,7 +86,7 @@ const ChangeInformation = ({ onClose, onUpdateSuccess }) => {
             Username
           </label>
           <input
-            type="email"
+            type="text"
             value={user.username}
             onChange={(prevUser, e) =>
               setUser((prevUser) => ({
